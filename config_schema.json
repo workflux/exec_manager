@@ -8,7 +8,7 @@
       "description": "URL to the S3 API.",
       "example": "http://localhost:4566",
       "env_names": [
-        "my_microservice_s3_endpoint_url"
+        "exec_manager_s3_endpoint_url"
       ],
       "type": "string"
     },
@@ -17,7 +17,7 @@
       "description": "Part of credentials for login into the S3 service. See: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html",
       "example": "my-access-key-id",
       "env_names": [
-        "my_microservice_s3_access_key_id"
+        "exec_manager_s3_access_key_id"
       ],
       "type": "string"
     },
@@ -26,7 +26,7 @@
       "description": "Part of credentials for login into the S3 service. See: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html",
       "example": "my-secret-access-key",
       "env_names": [
-        "my_microservice_s3_secret_access_key"
+        "exec_manager_s3_secret_access_key"
       ],
       "type": "string"
     },
@@ -35,7 +35,7 @@
       "description": "Part of credentials for login into the S3 service. See: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html",
       "example": "my-session-token",
       "env_names": [
-        "my_microservice_s3_session_token"
+        "exec_manager_s3_session_token"
       ],
       "type": "string"
     },
@@ -44,7 +44,7 @@
       "description": "Path to a config file for specifying more advanced S3 parameters. This should follow the format described here: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-a-configuration-file",
       "example": "~/.aws/config",
       "env_names": [
-        "my_microservice_aws_config_ini"
+        "exec_manager_aws_config_ini"
       ],
       "type": "string",
       "format": "path"
@@ -54,7 +54,7 @@
       "description": "A URL to a PostgreSQL database.",
       "example": "postgresql://user:password@mydbserver/dbname",
       "env_names": [
-        "my_microservice_db_url"
+        "exec_manager_db_url"
       ],
       "type": "string"
     },
@@ -63,15 +63,15 @@
       "description": "Print DB/ORM logs.",
       "default": false,
       "env_names": [
-        "my_microservice_db_print_logs"
+        "exec_manager_db_print_logs"
       ],
       "type": "boolean"
     },
     "service_name": {
       "title": "Service Name",
-      "default": "my_microservice",
+      "default": "exec_manager",
       "env_names": [
-        "my_microservice_service_name"
+        "exec_manager_service_name"
       ],
       "type": "string"
     },
@@ -80,7 +80,7 @@
       "description": "Name or IP address of the host running the RabbitMQ broker.",
       "example": "rabbitmq",
       "env_names": [
-        "my_microservice_rabbitmq_host"
+        "exec_manager_rabbitmq_host"
       ],
       "type": "string"
     },
@@ -89,7 +89,7 @@
       "description": "Port of the RabbitMQ broker running on the specified host.",
       "default": 5672,
       "env_names": [
-        "my_microservice_rabbitmq_port"
+        "exec_manager_rabbitmq_port"
       ],
       "type": "integer"
     },
@@ -98,7 +98,7 @@
       "description": "IP of the host.",
       "default": "127.0.0.1",
       "env_names": [
-        "my_microservice_host"
+        "exec_manager_host"
       ],
       "type": "string"
     },
@@ -107,7 +107,7 @@
       "description": "Port to expose the server on the specified host",
       "default": 8080,
       "env_names": [
-        "my_microservice_port"
+        "exec_manager_port"
       ],
       "type": "integer"
     },
@@ -116,7 +116,7 @@
       "description": "Controls the verbosity of the log.",
       "default": "info",
       "env_names": [
-        "my_microservice_log_level"
+        "exec_manager_log_level"
       ],
       "enum": [
         "critical",
@@ -133,7 +133,7 @@
       "description": "A development feature. Set to `True` to automatically reload the server upon code changes",
       "default": false,
       "env_names": [
-        "my_microservice_auto_reload"
+        "exec_manager_auto_reload"
       ],
       "type": "boolean"
     },
@@ -142,7 +142,7 @@
       "description": "Number of workers processes to run.",
       "default": 1,
       "env_names": [
-        "my_microservice_workers"
+        "exec_manager_workers"
       ],
       "type": "integer"
     },
@@ -151,7 +151,7 @@
       "description": "Root path at which the API is reachable. This is relative to the specified host and port.",
       "default": "/",
       "env_names": [
-        "my_microservice_api_root_path"
+        "exec_manager_api_root_path"
       ],
       "type": "string"
     },
@@ -160,7 +160,7 @@
       "description": "Path to get the openapi specification in JSON format. This is relative to the specified host and port.",
       "default": "/openapi.json",
       "env_names": [
-        "my_microservice_openapi_url"
+        "exec_manager_openapi_url"
       ],
       "type": "string"
     },
@@ -169,7 +169,7 @@
       "description": "Path to host the swagger documentation. This is relative to the specified host and port.",
       "default": "/docs",
       "env_names": [
-        "my_microservice_docs_url"
+        "exec_manager_docs_url"
       ],
       "type": "string"
     },
@@ -181,7 +181,7 @@
         "https://www.example.org"
       ],
       "env_names": [
-        "my_microservice_cors_allowed_origins"
+        "exec_manager_cors_allowed_origins"
       ],
       "type": "array",
       "items": {
@@ -196,7 +196,7 @@
         "https://www.example.org"
       ],
       "env_names": [
-        "my_microservice_cors_allow_credentials"
+        "exec_manager_cors_allow_credentials"
       ],
       "type": "boolean"
     },
@@ -207,7 +207,7 @@
         "*"
       ],
       "env_names": [
-        "my_microservice_cors_allowed_methods"
+        "exec_manager_cors_allowed_methods"
       ],
       "type": "array",
       "items": {
@@ -219,7 +219,7 @@
       "description": "A list of HTTP request headers that should be supported for cross-origin requests. Defaults to []. You can use ['*'] to allow all headers. The Accept, Accept-Language, Content-Language and Content-Type headers are always allowed for CORS requests.",
       "example": [],
       "env_names": [
-        "my_microservice_cors_allowed_headers"
+        "exec_manager_cors_allowed_headers"
       ],
       "type": "array",
       "items": {
@@ -230,7 +230,7 @@
       "title": "Language",
       "default": "Croatian",
       "env_names": [
-        "my_microservice_language"
+        "exec_manager_language"
       ],
       "enum": [
         "Greek",

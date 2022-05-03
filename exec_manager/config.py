@@ -25,11 +25,11 @@ from .models import SupportedLanguages
 
 
 # Please adapt config prefix and remove unnecessary config bases:
-@config_from_yaml(prefix="my_microservice")
+@config_from_yaml(prefix="exec_manager")
 class Config(ApiConfigBase, PubSubConfigBase, PostgresqlConfigBase, S3ConfigBase):
     """Config parameters and their defaults."""
 
-    service_name: str = "my_microservice"  # Please adapt
+    service_name: str = "exec_manager"  # Please adapt
     language: SupportedLanguages = "Croatian"
 
 
