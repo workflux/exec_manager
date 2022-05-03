@@ -2,8 +2,7 @@
   "title": "ModSettings",
   "description": "Modifies the orginal Settings class provided by the user",
   "type": "object",
-  "properties": {
-    "s3_endpoint_url": {
+  "properties": {"s3_endpoint_url": {
       "title": "S3 Endpoint Url",
       "description": "URL to the S3 API.",
       "example": "http://localhost:4566",

@@ -15,16 +15,10 @@
 
 """Entrypoint of the package"""
 
-from ghga_service_chassis_lib.api import run_server
 
-from .api.main import app  # noqa: F401 pylint: disable=unused-import
-from .config import CONFIG, Config
-
-
-def run(config: Config = CONFIG):
+def run():
     """Run the service"""
-    # Please adapt to package name
-    run_server(app="exec_manager.__main__:app", config=config)
+    ...
 
 
 if __name__ == "__main__":
