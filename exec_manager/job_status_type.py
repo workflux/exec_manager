@@ -13,6 +13,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""backend"""  # Please adapt to package
+"""enum for job status type"""
 
-__version__ = "0.1.0"
+from enum import Enum
+
+
+class JobStatusType(Enum):
+    """enumerate job status types"""
+
+    NOTSTARTET = "not started"
+    """job ist not started yet"""
+
+    PREPARING = "preparing"
+    """job is preparing"""
+
+    EXECUTING = "executing"
+    """job is executing"""
+
+    EVALUATING = "evaluating"
+    """job ist evaluating"""
+
+    FINALZING = "finalizing"
+    """job is finalizing"""
+
+    CANCELED = "canceled"
+    """job is canceled"""
+
+    FAILED = "failed"
+    """job is failed"""
+
+    SUCCEEDED = "succeeded"
+    """job is succeeded"""

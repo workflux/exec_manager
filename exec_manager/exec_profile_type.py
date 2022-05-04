@@ -13,6 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""backend"""  # Please adapt to package
+"""enum for exec profile type"""
 
-__version__ = "0.1.0"
+from enum import Enum
+
+
+class ExecProfileType(Enum):
+    """enumaerate exec profile types"""
+
+    BASH = "bash"
+    """execution with bash"""
+
+    PYTHON = "python"
+    """execution with python"""
+
+    WES = "wes"
+    """execution with wes"""

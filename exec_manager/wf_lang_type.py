@@ -13,6 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""backend"""  # Please adapt to package
+"""enum for workflow languagae type"""
 
-__version__ = "0.1.0"
+from enum import Enum
+
+
+class WfLangType(Enum):
+    """enumerate workflow language types"""
+
+    CWL = "cwl"
+    """cwl language"""
+
+    WDL = "wdl"
+    """wdl language"""
+
+    NEXTFLOW = "nextflow"
+    """nextflow  language"""
+
+    SNAKEMAKE = "snakemake"
+    """snakemake language"""
