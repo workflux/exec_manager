@@ -1,8 +1,37 @@
-import exec_manager.exec_profile_type as exec_profile_type
-import exec_manager.wf_lang_type as wf_lang_type
+"""class for exec profile"""
+
+from exec_manager.exec_profile_type import ExecProfileType
+from exec_manager.wf_lang_type import WfLangType
 
 
 class ExecProfile:
-    def __init__(self, type: exec_profile_type, wf_lang: wf_lang_type) -> None:
-        self.type = type
+    """
+    class for Exec-Profile
+
+    ...
+
+    Attributes
+    ----------
+    exec_profile_type : ExecProfileType
+        type of the exec profile (bash, python, wes)
+    wf_lang : WfLangType
+        workflow language (cwl, wdl, nextflow, snakemake
+
+    Methods
+    -------
+    """
+
+    def __init__(self, exec_profile_type: ExecProfileType, wf_lang: WfLangType) -> None:
+        """
+        Constructs all the necessary attributes for the exec profile object.
+
+        Parameters
+        ----------
+            exec_profile_type : ExecProfileType
+                type of the exec profile (bash, python, wes)
+            wf_lang : WfLangType
+                workflow language (cwl, wdl, nextflow, snakemake
+        """
+
+        self.exec_profile_type = exec_profile_type
         self.wf_lang = wf_lang

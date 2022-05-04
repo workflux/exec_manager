@@ -1,11 +1,27 @@
-import uuid
+"""class for job dao"""
 
-import exec_manager.job_status_type as job_status_type
+from uuid import UUID
+
+from exec_manager.job_status_type import JobStatusType
 
 
 class JobDAO:
-    def __init__(self) -> None:
-        pass
+    """
+    class for job dao
 
-    def update_job_status(self, job_id: uuid, new_job_status: job_status_type) -> None:
-        pass
+    ...
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+    update_job_status(self, job_id: UUID, new_job_status: JobStatusType) -> None:
+        updates the status of the job in database
+    """
+
+    def __init__(self) -> None:
+        """constructor"""
+
+    def update_job_status(self, job_id: UUID, new_job_status: JobStatusType) -> None:
+        """this method updates the job status"""

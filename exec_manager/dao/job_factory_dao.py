@@ -1,18 +1,40 @@
-import uuid
+"""class for job factory dao"""
 
-import exec_manager.exec_profile as exec_profile
-import exec_manager.job_status_type as job_status_type
+from uuid import UUID
+
+from exec_manager.exec_profile import ExecProfile
+from exec_manager.job_status_type import JobStatusType
 
 
 class JobFactoryDAO:
+    """
+    class for job factory dao
+
+    ...
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+    create_job(
+        self,
+        job_status: JobStatusType,
+        inputs: dict,
+        workflow,
+        exec_profile: ExecProfile,
+    ) -> uuid:
+        inserts job into database
+    """
+
     def __init__(self) -> None:
-        pass
+        """constructor"""
 
     def create_job(
         self,
-        job_status: job_status_type,
+        job_status: JobStatusType,
         inputs: dict,
         workflow,
-        exec_profile: exec_profile,
-    ) -> uuid:
-        pass
+        exec_profile: ExecProfile,
+    ) -> UUID:
+        """this method creates a job"""

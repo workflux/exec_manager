@@ -1,27 +1,55 @@
-import uuid
+"""class for python job"""
 
-import exec_manager.exec_profile as exec_profile
-import exec_manager.job as job
-import exec_manager.job_status_type as job_status_type
+from uuid import UUID
+
+from exec_manager.exec_profile import ExecProfile
+from exec_manager.job_status_type import JobStatusType
 
 
-class PythonJob(job):
+class PythonJob:
+    """
+    class for python job
+
+    ...
+
+    Attributes
+    ----------
+    job_id : uuid
+        id of the job
+    job_status : JobStatusType
+        current status of the job (eg. notstarted, succeeded, failed)
+    exec_profile : ExecProfile
+        python exec profile
+
+    Methods
+    -------
+    prepare() -> None:
+        prepares the job
+    exec() -> None:
+        executes the job
+    eval() -> None:
+        evaluates the job
+    finalize() -> None:
+        finalizes the job
+    cancel() -> None:
+    """
+
     def __init__(
-        self, job_id: uuid, job_status: job_status_type, exec_profile: exec_profile
+        self, job_id: UUID, job_status: JobStatusType, exec_profile: ExecProfile
     ) -> None:
-        super().__init__(job_id, job_status, exec_profile)
+        """constructor"""
 
     def prepare(self) -> None:
-        pass
+        """job preparation"""
 
     def exec(self) -> None:
-        pass
+        """job execution"""
 
     def eval(self) -> None:
-        pass
+        "job evaluation"
 
     def finalize(self) -> None:
-        pass
+        """job finalization"""
 
     def cancel(self) -> None:
-        pass
+        """job canceling"""
