@@ -15,11 +15,9 @@
 
 """Defines all database specific ORM models"""
 
-from sqlalchemy import JSON, Column, Integer, String
+from sqlalchemy import JSON, Column, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.decl_api import DeclarativeMeta
-
-from exec_manager.exec_profile import ExecProfile
 
 Base: DeclarativeMeta = declarative_base()
 
