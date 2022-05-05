@@ -15,26 +15,21 @@
 
 """Defines all database specific ORM models"""
 
-from sqlalchemy import JSON, Boolean, Column, Integer, String
+from sqlalchemy import JSON, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.decl_api import DeclarativeMeta
+
+from exec_manager.exec_profile import ExecProfile
 
 Base: DeclarativeMeta = declarative_base()
 
 
-class ExampleObjectA(Base):
-    """An example object stored in the DB"""
+class DBJob(Base):
+    """An job object stored in the DB"""
 
-    __tablename__ = "visas"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    some_json_details = Column(JSON, nullable=False)
-
-
-class ExampleObjectB(Base):
-    """Another example object stored in the DB"""
-
-    __tablename__ = "table_b"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    active = Column(Boolean, nullable=False)
+    __tablename__ = "job"
+    job_id = Column(Integer, primary_key=True)
+    job_status = Column(String, nullable=False)
+    exec_profile = Column(ExecProfile, nullable=False)
+    workflow = Column(JSON, nullable=False)
+    inputs = Column(dict, nullable=False)

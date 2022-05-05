@@ -27,10 +27,10 @@ class ExecProfile:
 
         Parameters
         ----------
-            exec_profile_type : ExecProfileType
-                type of the exec profile (bash, python, wes)
-            wf_lang : WfLangType
-                workflow language (cwl, wdl, nextflow, snakemake
+        exec_profile_type : ExecProfileType
+            type of the exec profile (bash, python, wes)
+        wf_lang : WfLangType
+            workflow language (cwl, wdl, nextflow, snakemake
         """
 
         self.exec_profile_type = exec_profile_type

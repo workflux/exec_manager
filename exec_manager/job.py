@@ -1,6 +1,5 @@
 """class for job"""
 
-from abc import abstractmethod
 from uuid import UUID
 
 from exec_manager.exec_profile import ExecProfile
@@ -44,33 +43,28 @@ class Job:
 
         Parameters
         ----------
-            job_id : uuid
-                id of the job
-            job_status : JobStatusType
-                current status of the job (eg. notstarted, succeeded, failed)
-            exec_profile : ExecProfile
-                exec profile with which the job should be executed
+        job_id : uuid
+            id of the job
+        job_status : JobStatusType
+            current status of the job (eg. notstarted, succeeded, failed)
+        exec_profile : ExecProfile
+            exec profile with which the job should be executed
         """
         self.job_id = job_id
         self.job_status = job_status
         self.exec_profile = exec_profile
 
-    @abstractmethod
     def prepare(self) -> None:
         """This method should implement the prepare execution step"""
 
-    @abstractmethod
     def exec(self) -> None:
         """This method should implement the exec execution step"""
 
-    @abstractmethod
     def eval(self) -> None:
         """This method should implement the eval execution step"""
 
-    @abstractmethod
     def finalize(self) -> None:
         """This method should implement the finalize execution step"""
 
-    @abstractmethod
     def cancel(self) -> None:
         """This method should implement the cancel execution step"""
