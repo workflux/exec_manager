@@ -28,8 +28,8 @@ class DBJob(Base):
     """An job object stored in the DB"""
 
     __tablename__ = "job"
-    job_id = Column(Integer, primary_key=True)
+    job_id = Column(String, primary_key=True)
     job_status = Column(String, nullable=False)
-    exec_profile = Column(ExecProfile, nullable=False)
+    exec_profile = Column(JSON, nullable=False)
     workflow = Column(JSON, nullable=False)
-    inputs = Column(dict, nullable=False)
+    inputs = Column(JSON, nullable=False)
