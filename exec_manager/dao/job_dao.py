@@ -69,8 +69,8 @@ def create_job_dao(
     """
 
     job_id = generate_job_id()
-    with Session(engine) as session:
-        session.insert(DBJob).values(job_id, job_status, exec_profile, workflow, inputs)
+    session = Session(engine)
+    session.insert(DBJob).values(job_id, job_status, exec_profile, workflow, inputs)
     return job_id
 
 
@@ -106,10 +106,10 @@ def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
     -------
     None
     """
-    with Session(engine) as session:
-        session.update(DBJob).where(DBJob.job_id == job_id).values(
-            job_status=new_job_status
-        )
+    session = Session(engine)
+    session.update(DBJob).where(DBJob.job_id == job_id).values(
+        job_status=new_job_status
+    )
 
 
 def get_job(job_id: UUID) -> Job:
@@ -125,5 +125,5 @@ def get_job(job_id: UUID) -> Job:
     -------
     Job
     """
-    with Session(engine) as session:
-        return session.select(DBJob).where(DBJob.job_id == job_id)
+    session = Session(engine)
+    return session.select(DBJob).where(DBJob.job_id == job_id)
