@@ -1,6 +1,6 @@
 """class for python job"""
 
-from subprocess import Popen
+from subprocess import Popen  # nosec
 from uuid import UUID
 
 import yaml

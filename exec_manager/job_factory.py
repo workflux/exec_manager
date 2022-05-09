@@ -1,6 +1,6 @@
 """class for job factory"""
 
-from dao.job_dao import JobDAO
+from dao.job_dao import create_job_dao
 from exec_profile import ExecProfile
 from exec_profile_type import ExecProfileType
 from job import Job
@@ -39,8 +39,7 @@ def create_job(inputs: dict, workflow, exec_profile: ExecProfile) -> Job:
     Job
     """
     job_status = JobStatusType.NOTSTARTET
-    job_dao = JobDAO()
-    job_id = job_dao.create_job_dao(job_status, exec_profile, workflow, inputs)
+    job_id = create_job_dao(job_status, exec_profile, workflow, inputs)
     if exec_profile.exec_profile_type == ExecProfileType.PYTHON:
         return PythonJob(job_id, job_status, exec_profile, inputs)
     if exec_profile.exec_profile_type == ExecProfileType.BASH:
