@@ -2,13 +2,14 @@
 
 from uuid import UUID, uuid4
 
-from sqlalchemy import engine_from_config
+from db_models import DBJob
+from exec_profile import ExecProfile
+from job import Job
+from job_status_type import JobStatusType
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from exec_manager.dao.db_models import DBJob
-from exec_manager.exec_profile import ExecProfile
-from exec_manager.job import Job
-from exec_manager.job_status_type import JobStatusType
+engine = create_engine("sqlite+pysqlite://")
 
 
 class JobDAO:
@@ -41,9 +42,6 @@ class JobDAO:
         generates a uuid as job id and checks its uniqueness
     """
 
-    def __init__(self) -> None:
-        """constructor"""
-
 
 def create_job_dao(
     job_status: JobStatusType,
@@ -71,11 +69,8 @@ def create_job_dao(
     """
 
     job_id = generate_job_id()
-    with Session(engine_from_config) as session:
-        with session.begin():
-            session.insert(DBJob).values(
-                job_id, job_status, exec_profile, workflow, inputs
-            )
+    with Session(engine) as session:
+        session.insert(DBJob).values(job_id, job_status, exec_profile, workflow, inputs)
     return job_id
 
 
@@ -111,11 +106,10 @@ def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
     -------
     None
     """
-    with Session(engine_from_config) as session:
-        with session.begin():
-            session.update(DBJob).where(DBJob.job_id == job_id).values(
-                job_status=new_job_status
-            )
+    with Session(engine) as session:
+        session.update(DBJob).where(DBJob.job_id == job_id).values(
+            job_status=new_job_status
+        )
 
 
 def get_job(job_id: UUID) -> Job:
@@ -131,6 +125,5 @@ def get_job(job_id: UUID) -> Job:
     -------
     Job
     """
-    with Session(engine_from_config) as session:
-        with session.begin():
-            return session.query(DBJob).filter_by(job_id=job_id).all()
+    with Session(engine) as session:
+        return session.select(DBJob).where(DBJob.job_id == job_id)
