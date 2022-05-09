@@ -69,7 +69,9 @@ def create_job_dao(
     job_id = generate_job_id()
     with engine.connect() as connection:
         connection.execute(
-            insert("job").values(job_id, job_status, exec_profile, workflow, inputs)
+            insert(DBJob.__tablename__).values(
+                job_id, job_status, exec_profile, workflow, inputs
+            )
         )
     return job_id
 
@@ -108,7 +110,7 @@ def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
     """
     with engine.connect() as connection:
         connection.execute(
-            update("job")
+            update(DBJob.__tablename__)
             .where(DBJob.job_id == job_id)
             .values(job_status=new_job_status)
         )
@@ -128,4 +130,4 @@ def get_job(job_id: UUID) -> Job:
     Job
     """
     with engine.connect() as connection:
-        return connection.execute(select("job").where(DBJob.job_id == job_id))
+        return connection.execute(select().where(DBJob.job_id == job_id))
