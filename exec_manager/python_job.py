@@ -1,15 +1,17 @@
 """class for python job"""
 
-from subprocess import Popen  # nosec
+# from subprocess import Popen  # nosec
 from uuid import UUID
-
-import yaml
 
 from exec_manager.dao.job_dao import update_job_status
 from exec_manager.exec_profile import ExecProfile
 from exec_manager.job import Job
 from exec_manager.job_status_type import JobStatusType
-from exec_manager.wf_lang_type import WfLangType
+
+# import yaml
+
+
+# from exec_manager.wf_lang_type import WfLangType
 
 
 class PythonJob(Job):
@@ -94,27 +96,27 @@ class PythonJob(Job):
         NONE
         """
         update_job_status(self.job_id, JobStatusType.EXECUTING)
-        if self.exec_profile.wf_lang == WfLangType.CWL:
-            data = yaml.dump(self.inputs)
-            with open("inputs.yaml", "w", encoding="utf-8") as input_file:
-                input_file.write(data)
-            command_list = ["cwltool ", self.exec_profile.workflow, input_file]
-            # this line triggers an bandit warning: "Issue:[B603:subprocess_without_shell_equals_
-            # true] subprocess call - check for execution of untrusted input."
-            # This warning is triggered because Popen takes an argument. If this is not an issue,
-            # you should remove the warning by #nosec after the line
-            with Popen(command_list) as command_execution:  # nosec
-                exit_code = command_execution.wait()
-                if exit_code == 0:
-                    update_job_status(self.job_id, JobStatusType.SUCCEEDED)
-                else:
-                    update_job_status(self.job_id, JobStatusType.FAILED)
-        elif self.exec_profile.wf_lang == WfLangType.WDL:
-            pass  # insert commands for executing wdl workflows
-        elif self.exec_profile.wf_lang == WfLangType.SNAKEMAKE:
-            pass  # insert commands for executing snakemake workflows
-        elif self.exec_profile.wf_lang == WfLangType.NEXTFLOW:
-            pass  # insert commands for executing nextflow workflows
+        # if self.exec_profile.wf_lang == WfLangType.CWL:
+        #     data = yaml.dump(self.inputs)
+        #     with open("inputs.yaml", "w", encoding="utf-8") as input_file:
+        #         input_file.write(data)
+        #     command_list = ["cwltool ", self.exec_profile.workflow, input_file]
+        #     # this line triggers an bandit warning: "Issue:[B603:subprocess_without_shell_equals_
+        #     # true] subprocess call - check for execution of untrusted input."
+        #     # This warning is triggered because Popen takes an argument. If this is not an issue,
+        #     # you should remove the warning by #nosec after the line
+        #     with Popen(command_list) as command_execution:  # nosec
+        #         exit_code = command_execution.wait()
+        #         if exit_code == 0:
+        #             update_job_status(self.job_id, JobStatusType.SUCCEEDED)
+        #         else:
+        #             update_job_status(self.job_id, JobStatusType.FAILED)
+        # elif self.exec_profile.wf_lang == WfLangType.WDL:
+        #     pass  # insert commands for executing wdl workflows
+        # elif self.exec_profile.wf_lang == WfLangType.SNAKEMAKE:
+        #     pass  # insert commands for executing snakemake workflows
+        # elif self.exec_profile.wf_lang == WfLangType.NEXTFLOW:
+        #     pass  # insert commands for executing nextflow workflows
 
     def eval(self) -> None:
         """
