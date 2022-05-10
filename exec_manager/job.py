@@ -2,8 +2,8 @@
 
 from uuid import UUID
 
-from exec_profile import ExecProfile
-from job_status_type import JobStatusType
+from exec_manager.exec_profile import ExecProfile
+from exec_manager.job_status_type import JobStatusType
 
 
 class Job:

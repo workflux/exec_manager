@@ -2,44 +2,48 @@
 
 from uuid import UUID, uuid4
 
-from db_models import DBJob
-from exec_profile import ExecProfile
-from job import Job
-from job_status_type import JobStatusType
 from sqlalchemy import create_engine, insert, select, update
+
+from exec_manager.dao.db_models import DBJob
+from exec_manager.exec_profile import ExecProfile
+from exec_manager.job import Job
+from exec_manager.job_status_type import JobStatusType
 
 engine = create_engine("sqlite+pysqlite://")
 
 
-class JobDAO:
-    """
-    class for job dao
+# class JobDAO:
+#     """
+#     class for job dao
 
-    ...
+#     ...
 
-    Attributes
-    ----------
+#     Attributes
+#     ----------
 
-    Methods
-    -------
-    create_job(
-    self,
-    job_status: JobStatusType,
-    inputs: dict,
-    workflow,
-    exec_profile: ExecProfile,
-    ) -> UUID:
-        creates a job
+#     Methods
+#     -------
+#     create_job(
+#     self,
+#     job_status: JobStatusType,
+#     inputs: dict,
+#     workflow,
+#     exec_profile: ExecProfile,
+#     ) -> UUID:
+#         creates a job
 
-    update_job_status(self, job_id: UUID, new_job_status: JobStatusType) -> None:
-        updates the status of the job in database
+#     update_job_status(self, job_id: UUID, new_job_status: JobStatusType) -> None:
+#         updates the status of the job in database
 
-    get_job(job_id: UUID) -> Job:
-        returns a job by the job id
+#     get_job(job_id: UUID) -> Job:
+#         returns a job by the job id
 
-    generate_job_id() -> UUID:
-        generates a uuid as job id and checks its uniqueness
-    """
+#     generate_job_id() -> UUID:
+#         generates a uuid as job id and checks its uniqueness
+#     """
+
+#     def __init__(self) -> None:
+#         """constructor"""
 
 
 def create_job_dao(
@@ -78,7 +82,7 @@ def create_job_dao(
 
 def generate_job_id() -> UUID:
     """
-    Generates an unique job id.
+    Generates a unique job id.
 
     Parameters
     ----------

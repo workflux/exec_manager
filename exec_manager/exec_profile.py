@@ -1,8 +1,9 @@
 """class for exec profile"""
 
-from exec_profile_type import ExecProfileType
 from sqlalchemy import JSON
-from wf_lang_type import WfLangType
+
+from exec_manager.exec_profile_type import ExecProfileType
+from exec_manager.wf_lang_type import WfLangType
 
 
 class ExecProfile:
@@ -34,6 +35,8 @@ class ExecProfile:
             type of the exec profile (bash, python, wes)
         wf_lang : WfLangType
             workflow language (cwl, wdl, nextflow, snakemake
+        workflow
+            workflow (file)
         """
         self.exec_profile_type = exec_profile_type
         self.wf_lang = wf_lang

@@ -4,11 +4,11 @@ from subprocess import Popen  # nosec
 from uuid import UUID
 
 import yaml
-from dao.job_dao import update_job_status
-from exec_profile import ExecProfile
-from job import Job
-from job_status_type import JobStatusType
 
+from exec_manager.dao.job_dao import update_job_status
+from exec_manager.exec_profile import ExecProfile
+from exec_manager.job import Job
+from exec_manager.job_status_type import JobStatusType
 from exec_manager.wf_lang_type import WfLangType
 
 
@@ -20,12 +20,14 @@ class PythonJob(Job):
 
     Attributes
     ----------
-    job_id : uuid
+    job_id : UUID
         id of the job
     job_status : JobStatusType
         current status of the job (eg. notstarted, succeeded, failed)
     exec_profile : ExecProfile
         python exec profile
+    inputs : dict
+        input parameters of the job
 
     Methods
     -------
@@ -38,6 +40,7 @@ class PythonJob(Job):
     finalize() -> None:
         finalizes the job
     cancel() -> None:
+        cancels the job
     """
 
     def __init__(
@@ -47,7 +50,20 @@ class PythonJob(Job):
         exec_profile: ExecProfile,
         inputs: dict,
     ) -> None:
-        """Constructs all the necessary attributes for the python job object."""
+        """
+        Constructs all the necessary attributes for the python job object.
+
+        Parameters
+        ----------
+        job_id : uuid
+            id of the job
+        job_status : JobStatusType
+            current status of the job (eg. notstarted, succeeded, failed)
+        exec_profile : ExecProfile
+            python exec profile
+        inputs : dict
+            input parameters of the job
+        """
         Job.__init__(self, job_id, job_status, exec_profile)
         self.inputs = inputs
 
@@ -62,6 +78,7 @@ class PythonJob(Job):
         -------
         NONE
         """
+        # setup
         # job_dao = JobDAO()
         # job_dao.update_job_status(self.job_id, JobStatusType.PREPARING)
 
@@ -89,9 +106,9 @@ class PythonJob(Job):
             with Popen(command_list) as command_execution:  # nosec
                 exit_code = command_execution.wait()
                 if exit_code == 0:
-                    update_job_status(JobStatusType.SUCCEEDED)
+                    update_job_status(self.job_id, JobStatusType.SUCCEEDED)
                 else:
-                    update_job_status(JobStatusType.FAILED)
+                    update_job_status(self.job_id, JobStatusType.FAILED)
         elif self.exec_profile.wf_lang == WfLangType.WDL:
             pass  # insert commands for executing wdl workflows
         elif self.exec_profile.wf_lang == WfLangType.SNAKEMAKE:
@@ -110,6 +127,7 @@ class PythonJob(Job):
         -------
         NONE
         """
+        # success or fail
         # job_dao = JobDAO()
         # job_dao.update_job_status(self.job_id, JobStatusType.EVALUATING)
 
@@ -124,6 +142,7 @@ class PythonJob(Job):
         -------
         NONE
         """
+        # teer down
         # job_dao = JobDAO()
         # job_dao.update_job_status(self.job_id, JobStatusType.FINALZING)
 
@@ -139,5 +158,5 @@ class PythonJob(Job):
         NONE
         """
         # job_dao = JobDAO()
-        # # access Popen object (p) and run p.terminate()
+        # # access Popen object (execution) and run execution.terminate()
         # job_dao.update_job_status(self.job_id, JobStatusType.CANCELED)
