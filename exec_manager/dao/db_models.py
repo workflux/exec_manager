@@ -21,12 +21,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.decl_api import DeclarativeMeta
 
 Base: DeclarativeMeta = declarative_base()
+metadata = Base.metadata
 
 
 class DBJob(Base):
     """An job object stored in the DB"""
 
     __tablename__ = "job"
+
     job_id = Column(String, primary_key=True)
     job_status = Column(String, nullable=False)
     exec_profile = Column(JSON, nullable=False)

@@ -18,15 +18,9 @@
 # from subprocess import Popen  # nosec
 from uuid import UUID
 
-from exec_manager.dao.job_dao import update_job_status
 from exec_manager.exec_profile import ExecProfile
 from exec_manager.job import Job
 from exec_manager.job_status_type import JobStatusType
-
-# import yaml
-
-
-# from exec_manager.wf_lang_type import WfLangType
 
 
 class PythonJob(Job):
@@ -80,9 +74,12 @@ class PythonJob(Job):
             python exec profile
         inputs : dict
             input parameters of the job
+        py_exec_session : PyExecSession
+            session in which the job will be run
         """
         Job.__init__(self, job_id, job_status, exec_profile)
         self.inputs = inputs
+        self.wf_lang = exec_profile.wf_lang
 
     def prepare(self) -> None:
         """
@@ -95,9 +92,6 @@ class PythonJob(Job):
         -------
         NONE
         """
-        # setup
-        # job_dao = JobDAO()
-        # job_dao.update_job_status(self.job_id, JobStatusType.PREPARING)
 
     def exec(self) -> None:
         """
@@ -110,28 +104,6 @@ class PythonJob(Job):
         -------
         NONE
         """
-        update_job_status(self.job_id, JobStatusType.EXECUTING)
-        # if self.exec_profile.wf_lang == WfLangType.CWL:
-        #     data = yaml.dump(self.inputs)
-        #     with open("inputs.yaml", "w", encoding="utf-8") as input_file:
-        #         input_file.write(data)
-        #     command_list = ["cwltool ", self.exec_profile.workflow, input_file]
-        #     # this line triggers an bandit warning: "Issue:[B603:subprocess_without_shell_equals_
-        #     # true] subprocess call - check for execution of untrusted input."
-        #     # This warning is triggered because Popen takes an argument. If this is not an issue,
-        #     # you should remove the warning by #nosec after the line
-        #     with Popen(command_list) as command_execution:  # nosec
-        #         exit_code = command_execution.wait()
-        #         if exit_code == 0:
-        #             update_job_status(self.job_id, JobStatusType.SUCCEEDED)
-        #         else:
-        #             update_job_status(self.job_id, JobStatusType.FAILED)
-        # elif self.exec_profile.wf_lang == WfLangType.WDL:
-        #     pass  # insert commands for executing wdl workflows
-        # elif self.exec_profile.wf_lang == WfLangType.SNAKEMAKE:
-        #     pass  # insert commands for executing snakemake workflows
-        # elif self.exec_profile.wf_lang == WfLangType.NEXTFLOW:
-        #     pass  # insert commands for executing nextflow workflows
 
     def eval(self) -> None:
         """
@@ -144,9 +116,6 @@ class PythonJob(Job):
         -------
         NONE
         """
-        # success or fail
-        # job_dao = JobDAO()
-        # job_dao.update_job_status(self.job_id, JobStatusType.EVALUATING)
 
     def finalize(self) -> None:
         """
@@ -159,9 +128,6 @@ class PythonJob(Job):
         -------
         NONE
         """
-        # teer down
-        # job_dao = JobDAO()
-        # job_dao.update_job_status(self.job_id, JobStatusType.FINALZING)
 
     def cancel(self) -> None:
         """
@@ -174,6 +140,3 @@ class PythonJob(Job):
         -------
         NONE
         """
-        # job_dao = JobDAO()
-        # # access Popen object (execution) and run execution.terminate()
-        # job_dao.update_job_status(self.job_id, JobStatusType.CANCELED)

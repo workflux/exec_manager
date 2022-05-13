@@ -15,17 +15,17 @@
 
 """class for job dao"""
 
+import json
 from uuid import UUID, uuid4
 
-from sqlalchemy import create_engine, insert, select, update
+from sqlalchemy import JSON, create_engine, insert, select, update
 
 from exec_manager.dao.db_models import DBJob
 from exec_manager.exec_profile import ExecProfile
+from exec_manager.exec_profile_type import ExecProfileType
 from exec_manager.job import Job
 from exec_manager.job_status_type import JobStatusType
-
-engine = create_engine("sqlite+pysqlite://")
-
+from exec_manager.wf_lang_type import WfLangType
 
 # class JobDAO:
 #     """
@@ -60,11 +60,14 @@ engine = create_engine("sqlite+pysqlite://")
 #     def __init__(self) -> None:
 #         """constructor"""
 
+# global engine
+engine = create_engine("sqlite+pysqlite://")
+
 
 def create_job_dao(
     job_status: JobStatusType,
     exec_profile: ExecProfile,
-    workflow,
+    workflow: JSON,
     inputs: dict,
 ) -> UUID:
     """
@@ -86,10 +89,19 @@ def create_job_dao(
     UUID
     """
     job_id = generate_job_id()
+    job_id_str = str(job_id)
+    job_status_str = job_status.value
+    exec_profile_json = json.dumps(
+        {
+            "exec_profile_type": exec_profile.exec_profile_type.value,
+            "wf_lang": exec_profile.wf_lang.value,
+        }
+    )
+    inputs_json = json.dumps(inputs)
     with engine.connect() as connection:
         connection.execute(
-            insert(DBJob.__tablename__).values(
-                job_id, job_status, exec_profile, workflow, inputs
+            insert(DBJob).values(
+                (job_id_str, job_status_str, exec_profile_json, workflow, inputs_json)
             )
         )
     return job_id
@@ -107,8 +119,8 @@ def generate_job_id() -> UUID:
     UUID
     """
     job_id = uuid4()
-    while get_job(job_id) is not None:
-        job_id = uuid4()
+    # while get_job(job_id, engine) is not None:
+    #     job_id = uuid4()
     return job_id
 
 
@@ -129,7 +141,7 @@ def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
     """
     with engine.connect() as connection:
         connection.execute(
-            update(DBJob.__tablename__)
+            update(DBJob)
             .where(DBJob.job_id == job_id)
             .values(job_status=new_job_status)
         )
@@ -149,4 +161,12 @@ def get_job(job_id: UUID) -> Job:
     Job
     """
     with engine.connect() as connection:
-        return connection.execute(select().where(DBJob.job_id == job_id))
+        cursor = connection.execute(select(DBJob).where(DBJob.job_id == str(job_id)))
+        result = cursor.fetchall()
+        job_status = JobStatusType(result[0][1])
+        exec_profile = json.loads(result[0][2])
+        exec_profile = ExecProfile(
+            ExecProfileType(exec_profile["exec_profile_type"]),
+            WfLangType(exec_profile["wf_lang"]),
+        )
+        return Job(job_id, job_status, exec_profile)

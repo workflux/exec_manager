@@ -21,7 +21,7 @@ from enum import Enum
 class JobStatusType(Enum):
     """enumerate job status types"""
 
-    NOTSTARTET = "not startetd"
+    NOTSTARTET = "not started"
     """job ist not started yet"""
 
     PREPARING = "preparing"

@@ -69,17 +69,74 @@ class Job:
         self.job_status = job_status
         self.exec_profile = exec_profile
 
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, Job):
+            return (
+                self.job_id == __o.job_id
+                and self.job_status == __o.job_status
+                and self.exec_profile == __o.exec_profile
+            )
+        return NotImplemented
+
+    # def __hash__(self) -> int:
+    #     return hash((self.job_id, self.job_status, self.exec_profile))
+
     def prepare(self) -> None:
-        """This method should implement the prepare execution step"""
+        """
+        Prepares the job.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        NONE
+        """
 
     def exec(self) -> None:
-        """This method should implement the exec execution step"""
+        """
+        Executes the job.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        NONE
+        """
 
     def eval(self) -> None:
-        """This method should implement the eval execution step"""
+        """
+        Evaluates the job.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        NONE
+        """
 
     def finalize(self) -> None:
-        """This method should implement the finalize execution step"""
+        """
+        Finalizes the job.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        NONE
+        """
 
     def cancel(self) -> None:
-        """This method should implement the cancel execution step"""
+        """
+        Cancels the job.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        NONE
+        """
