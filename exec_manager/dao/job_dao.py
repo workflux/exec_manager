@@ -18,7 +18,7 @@
 import json
 from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, create_engine, insert, select, update
+from sqlalchemy import create_engine, insert, select, update
 
 from exec_manager.dao.db_models import DBJob, metadata
 from exec_manager.exec_profile import ExecProfile
@@ -67,7 +67,7 @@ metadata.create_all(DB_ENGINE)
 def create_job_dao(
     job_status: JobStatusType,
     exec_profile: ExecProfile,
-    workflow: JSON,
+    workflow: dict,
     inputs: dict,
 ) -> UUID:
     """
@@ -100,7 +100,7 @@ def create_job_dao(
     inputs_json = json.dumps(inputs)
     with DB_ENGINE.connect() as connection:
         connection.execute(
-            insert(DBJob).values(
+            insert(DBJob.__table__).values(
                 (job_id_str, job_status_str, exec_profile_json, workflow, inputs_json)
             )
         )
@@ -122,7 +122,7 @@ def get_job(job_id: UUID) -> Job:
     """
     with DB_ENGINE.connect() as connection:
         cursor = connection.execute(
-            select([DBJob.job_id, DBJob.job_status, DBJob.exec_profile]).where(
+            select(DBJob.job_id, DBJob.job_status, DBJob.exec_profile).where(
                 DBJob.job_id == str(job_id)
             )
         )
@@ -153,7 +153,7 @@ def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
     """
     with DB_ENGINE.connect() as connection:
         connection.execute(
-            update(DBJob)
+            update(DBJob.__table__)
             .where(DBJob.job_id == str(job_id))
             .values(job_status=new_job_status.value)
         )

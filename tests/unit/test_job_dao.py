@@ -30,21 +30,17 @@ from exec_manager.wf_lang_type import WfLangType
 # metadata.create_all(engine)
 job_status = JobStatusType.NOTSTARTET
 exec_profile = ExecProfile(ExecProfileType.PYTHON, WfLangType.CWL)
-workflow = "test_workflow.json"  # {"test" : 1}
+workflow = {"test": 1}
 inputs = {"hello": "world"}
 example_job_id = create_job_dao(
     JobStatusType.NOTSTARTET,
     ExecProfile(ExecProfileType.PYTHON, WfLangType.CWL),
-    json.dumps({"test": 1}),
-    {"hello": "world"},
+    workflow,
+    inputs,
 )
 
 
 def test_create_job_dao():
-    job_status = JobStatusType.NOTSTARTET
-    exec_profile = ExecProfile(ExecProfileType.PYTHON, WfLangType.CWL)
-    workflow = json.dumps({"test": 1})
-    inputs = {"hello": "world"}
     job_id = create_job_dao(
         job_status,
         exec_profile,
@@ -78,7 +74,7 @@ def test_get_job():
     db_job = get_job(job_id)
     assert (
         str(db_job.job_id) == str(job_id)
-        and db_job.job_status.value == JobStatusType.NOTSTARTET.value
+        and db_job.job_status.value == job_status.value
         and (
             json.dumps(
                 {
@@ -98,11 +94,11 @@ def test_get_job():
 
 def test_update_job_status():
     job_id = example_job_id
-    update_job_status(job_id, JobStatusType.NOTSTARTET)
+    update_job_status(job_id, JobStatusType.PREPARING)
     db_job = get_job(job_id)
     assert (
         str(db_job.job_id) == str(job_id)
-        and db_job.job_status.value == JobStatusType.NOTSTARTET.value
+        and db_job.job_status.value == JobStatusType.PREPARING.value
         and (
             json.dumps(
                 {
