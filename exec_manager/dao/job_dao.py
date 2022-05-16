@@ -122,7 +122,7 @@ def get_job(job_id: UUID) -> Job:
     """
     with DB_ENGINE.connect() as connection:
         cursor = connection.execute(
-            select(DBJob.job_id, DBJob.job_status, DBJob.exec_profile).where(
+            select([DBJob.job_id, DBJob.job_status, DBJob.exec_profile]).where(
                 DBJob.job_id == str(job_id)
             )
         )
