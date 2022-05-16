@@ -18,9 +18,7 @@
 
 from uuid import UUID
 
-from job_dao import get_job, update_job_status
-from sqlalchemy import Integer
-
+from exec_manager.dao.job_dao import get_job, update_job_status
 from exec_manager.exec_profile import ExecProfile
 from exec_manager.job_status_type import JobStatusType
 from exec_manager.python_job import PythonJob
@@ -44,7 +42,7 @@ class PyExecSession:
 
     def __init__(
         self,
-        max_retries: Integer = 0,
+        max_retries: int = 0,
     ) -> None:
         """
         Constructs all the necessary attributes for the python exec session.

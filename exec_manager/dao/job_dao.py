@@ -20,7 +20,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import JSON, create_engine, insert, select, update
 
-from exec_manager.dao.db_models import DBJob
+from exec_manager.dao.db_models import DBJob, metadata
 from exec_manager.exec_profile import ExecProfile
 from exec_manager.exec_profile_type import ExecProfileType
 from exec_manager.job import Job
@@ -60,8 +60,8 @@ from exec_manager.wf_lang_type import WfLangType
 #     def __init__(self) -> None:
 #         """constructor"""
 
-# global engine
-engine = create_engine("sqlite+pysqlite://")
+DB_ENGINE = create_engine("sqlite+pysqlite://")
+metadata.create_all(DB_ENGINE)
 
 
 def create_job_dao(
@@ -98,7 +98,7 @@ def create_job_dao(
         }
     )
     inputs_json = json.dumps(inputs)
-    with engine.connect() as connection:
+    with DB_ENGINE.connect() as connection:
         connection.execute(
             insert(DBJob).values(
                 (job_id_str, job_status_str, exec_profile_json, workflow, inputs_json)
@@ -107,21 +107,33 @@ def create_job_dao(
     return job_id
 
 
-def generate_job_id() -> UUID:
+def get_job(job_id: UUID) -> Job:
     """
-    Generates a unique job id.
+    Returns a job by his job id.
 
     Parameters
     ----------
+    job_id: UUID
+        id of the job
 
     Returns
     -------
-    UUID
+    Job
     """
-    job_id = uuid4()
-    # while get_job(job_id, engine) is not None:
-    #     job_id = uuid4()
-    return job_id
+    with DB_ENGINE.connect() as connection:
+        cursor = connection.execute(
+            select([DBJob.job_id, DBJob.job_status, DBJob.exec_profile]).where(
+                DBJob.job_id == str(job_id)
+            )
+        )
+        result = cursor.fetchall()
+        job_status = JobStatusType(result[0][1])
+        exec_profile = json.loads(result[0][2])
+        exec_profile = ExecProfile(
+            ExecProfileType(exec_profile["exec_profile_type"]),
+            WfLangType(exec_profile["wf_lang"]),
+        )
+        return Job(job_id, job_status, exec_profile)
 
 
 def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
@@ -139,34 +151,26 @@ def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
     -------
     None
     """
-    with engine.connect() as connection:
+    with DB_ENGINE.connect() as connection:
         connection.execute(
             update(DBJob)
-            .where(DBJob.job_id == job_id)
-            .values(job_status=new_job_status)
+            .where(DBJob.job_id == str(job_id))
+            .values(job_status=new_job_status.value)
         )
 
 
-def get_job(job_id: UUID) -> Job:
+def generate_job_id() -> UUID:
     """
-    Returns a job by his job id.
+    Generates a unique job id.
 
     Parameters
     ----------
-    job_id: UUID
-        id of the job
 
     Returns
     -------
-    Job
+    UUID
     """
-    with engine.connect() as connection:
-        cursor = connection.execute(select(DBJob).where(DBJob.job_id == str(job_id)))
-        result = cursor.fetchall()
-        job_status = JobStatusType(result[0][1])
-        exec_profile = json.loads(result[0][2])
-        exec_profile = ExecProfile(
-            ExecProfileType(exec_profile["exec_profile_type"]),
-            WfLangType(exec_profile["wf_lang"]),
-        )
-        return Job(job_id, job_status, exec_profile)
+    job_id = uuid4()
+    # while get_job(job_id, engine) is not None:
+    #     job_id = uuid4()
+    return job_id
