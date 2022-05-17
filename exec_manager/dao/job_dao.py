@@ -18,7 +18,8 @@
 import json
 from uuid import UUID, uuid4
 
-from sqlalchemy import create_engine, engine, insert, select, update
+from sqlalchemy import create_engine, insert, select, update
+from sqlalchemy.engine import Engine
 
 from exec_manager.dao.db_models import DBJob, metadata
 from exec_manager.exec_profile import ExecProfile
@@ -36,7 +37,7 @@ def create_job_dao(
     exec_profile: ExecProfile,
     workflow: dict,
     inputs: dict,
-    db_engine: engine = DB_ENGINE,
+    db_engine: Engine = DB_ENGINE,
 ) -> UUID:
     """
     Inserts a job into the database.
@@ -77,7 +78,7 @@ def create_job_dao(
     return job_id
 
 
-def get_job(job_id: UUID, db_engine: engine = DB_ENGINE) -> Job:
+def get_job(job_id: UUID, db_engine: Engine = DB_ENGINE) -> Job:
     """
     Returns a job by his job id.
 
@@ -109,7 +110,7 @@ def get_job(job_id: UUID, db_engine: engine = DB_ENGINE) -> Job:
 
 
 def update_job_status(
-    job_id: UUID, new_job_status: JobStatusType, db_engine: engine = DB_ENGINE
+    job_id: UUID, new_job_status: JobStatusType, db_engine: Engine = DB_ENGINE
 ) -> None:
     """
     Updates a jobs status by his job id.
