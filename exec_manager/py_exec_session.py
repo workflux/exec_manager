@@ -50,6 +50,7 @@ class PyExecSession:
         Parameters
         ----------
         max_retries : int
+            number of maximum retries when the execution fails
         """
         self.max_retries = max_retries
 

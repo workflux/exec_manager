@@ -21,7 +21,9 @@ from exec_manager.exec_profile_type import ExecProfileType
 from exec_manager.job_status_type import JobStatusType
 from exec_manager.wf_lang_type import WfLangType
 
-# from uuid import UUID
+# import pytest
+# from exec_manager.dao.db_models import metadata
+# from sqlalchemy import create_engine
 
 
 # @pytest.fixture
@@ -55,13 +57,9 @@ example_job_id = create_job_dao(
 )
 
 
+# @pytest.mark.usefixtures("example_engine")
 def test_create_job_dao():
-    job_id = create_job_dao(
-        job_status,
-        exec_profile,
-        workflow,
-        inputs,
-    )
+    job_id = create_job_dao(job_status, exec_profile, workflow, inputs)
     db_job = get_job(job_id)
     assert (
         str(db_job.job_id) == str(job_id)
@@ -83,7 +81,7 @@ def test_create_job_dao():
     )
 
 
-# convert every object to string to check if the content of the objects are equal
+# @pytest.mark.usefixtures("example_engine")
 def test_get_job():
     job_id = example_job_id
     db_job = get_job(job_id)
@@ -107,6 +105,7 @@ def test_get_job():
     )
 
 
+# @pytest.mark.usefixtures("example_engine")
 def test_update_job_status():
     job_id = example_job_id
     update_job_status(job_id, JobStatusType.PREPARING)

@@ -25,25 +25,6 @@ from exec_manager.job_status_type import JobStatusType
 from exec_manager.python_job import PythonJob
 
 
-class JobFactory:
-    """
-    class for job factory
-
-    ...
-
-    Attributes
-    ----------
-
-    Methods
-    -------
-    create_job(inputs: dict, workflow, exec_profile: ExecProfile) -> Job:
-        creates a new job
-    """
-
-    def __init__(self) -> None:
-        """this is the constructor"""
-
-
 def create_job(
     inputs: dict,
     workflow,

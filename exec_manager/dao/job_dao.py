@@ -18,7 +18,7 @@
 import json
 from uuid import UUID, uuid4
 
-from sqlalchemy import create_engine, insert, select, update
+from sqlalchemy import create_engine, engine, insert, select, update
 
 from exec_manager.dao.db_models import DBJob, metadata
 from exec_manager.exec_profile import ExecProfile
@@ -26,39 +26,6 @@ from exec_manager.exec_profile_type import ExecProfileType
 from exec_manager.job import Job
 from exec_manager.job_status_type import JobStatusType
 from exec_manager.wf_lang_type import WfLangType
-
-# class JobDAO:
-#     """
-#     class for job dao
-
-#     ...
-
-#     Attributes
-#     ----------
-
-#     Methods
-#     -------
-#     create_job(
-#     self,
-#     job_status: JobStatusType,
-#     inputs: dict,
-#     workflow,
-#     exec_profile: ExecProfile,
-#     ) -> UUID:
-#         creates a job
-
-#     update_job_status(self, job_id: UUID, new_job_status: JobStatusType) -> None:
-#         updates the status of the job in database
-
-#     get_job(job_id: UUID) -> Job:
-#         returns a job by the job id
-
-#     generate_job_id() -> UUID:
-#         generates a uuid as job id and checks its uniqueness
-#     """
-
-#     def __init__(self) -> None:
-#         """constructor"""
 
 DB_ENGINE = create_engine("sqlite+pysqlite://")
 metadata.create_all(DB_ENGINE)
@@ -69,6 +36,7 @@ def create_job_dao(
     exec_profile: ExecProfile,
     workflow: dict,
     inputs: dict,
+    db_engine: engine = DB_ENGINE,
 ) -> UUID:
     """
     Inserts a job into the database.
@@ -83,6 +51,8 @@ def create_job_dao(
         the jobs workflow
     inputs: dict
         the input parameters of the job
+    engine: engine
+        db engine where the connection will be established (default is sqlite with pysqlite)
 
     Returns
     -------
@@ -98,7 +68,7 @@ def create_job_dao(
         }
     )
     inputs_json = json.dumps(inputs)
-    with DB_ENGINE.connect() as connection:
+    with db_engine.connect() as connection:
         connection.execute(
             insert(DBJob.__table__).values(
                 (job_id_str, job_status_str, exec_profile_json, workflow, inputs_json)
@@ -107,7 +77,7 @@ def create_job_dao(
     return job_id
 
 
-def get_job(job_id: UUID) -> Job:
+def get_job(job_id: UUID, db_engine: engine = DB_ENGINE) -> Job:
     """
     Returns a job by his job id.
 
@@ -115,12 +85,14 @@ def get_job(job_id: UUID) -> Job:
     ----------
     job_id: UUID
         id of the job
+    engine: engine
+        db engine where the connection will be established (default is sqlite with pysqlite)
 
     Returns
     -------
     Job
     """
-    with DB_ENGINE.connect() as connection:
+    with db_engine.connect() as connection:
         cursor = connection.execute(
             select([DBJob.job_id, DBJob.job_status, DBJob.exec_profile]).where(
                 DBJob.job_id == str(job_id)
@@ -136,7 +108,9 @@ def get_job(job_id: UUID) -> Job:
         return Job(job_id, job_status, exec_profile)
 
 
-def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
+def update_job_status(
+    job_id: UUID, new_job_status: JobStatusType, db_engine: engine = DB_ENGINE
+) -> None:
     """
     Updates a jobs status by his job id.
 
@@ -146,12 +120,14 @@ def update_job_status(job_id: UUID, new_job_status: JobStatusType) -> None:
         id of the job
     new_job_status: JobStatusType
         new status of the job; cannot be JobStatusType.NOTSTARTED
+    engine: engine
+        db engine where the connection will be established (default is sqlite with pysqlite)
 
     Returns
     -------
     None
     """
-    with DB_ENGINE.connect() as connection:
+    with db_engine.connect() as connection:
         connection.execute(
             update(DBJob.__table__)
             .where(DBJob.job_id == str(job_id))
@@ -171,6 +147,6 @@ def generate_job_id() -> UUID:
     UUID
     """
     job_id = uuid4()
-    # while get_job(job_id, engine) is not None:
-    #     job_id = uuid4()
+    # while get_job(job_id) is not None:
+    # job_id = uuid4()
     return job_id
