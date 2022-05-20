@@ -1,5 +1,4 @@
-# Copyright 2021 - 2022 Universität Tübingen, DKFZ and EMBL
-# for the German Human Genome-Phenome Archive (GHGA)
+# Copyright 2021 - 2022 German Cancer Research Center (DKFZ)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +14,7 @@
 
 """Defines all database specific ORM models"""
 
-
+import uuid
 from sqlalchemy import JSON, Column, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.decl_api import DeclarativeMeta
@@ -29,7 +28,7 @@ class DBJob(Base):
 
     __tablename__ = "job"
 
-    job_id = Column(String, primary_key=True)
+    job_id = Column(String, default=uuid.uuid4(), primary_key=True)
     job_status = Column(String, nullable=False)
     exec_profile = Column(JSON, nullable=False)
     workflow = Column(JSON, nullable=False)

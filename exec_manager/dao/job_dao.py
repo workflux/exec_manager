@@ -1,5 +1,4 @@
-# Copyright 2021 - 2022 Universität Tübingen, DKFZ and EMBL
-# for the German Human Genome-Phenome Archive (GHGA)
+# Copyright 2021 - 2022 German Cancer Research Center (DKFZ)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,9 +27,94 @@ from exec_manager.job import Job
 from exec_manager.job_status_type import JobStatusType
 from exec_manager.wf_lang_type import WfLangType
 
-DB_ENGINE = create_engine("sqlite+pysqlite://")
-metadata.create_all(DB_ENGINE)
+from abc import ABC, abstractmethod
 
+class JobDAO(ABC):
+    
+    @abstractmethod
+    def create(
+        self,
+        job_status: JobStatusType,
+        exec_profile: ExecProfile,
+        workflow: dict,
+        inputs: dict,
+    ) -> UUID:
+        """
+        Inserts a job into the database.
+
+        Parameters
+        ----------
+        job_status: JobStatusType
+            current status of the job; initially it is JobStatusType.NOTSTARTED
+        exec_profile: ExecProfile
+            exec profile of this job
+        workflow
+            the jobs workflow
+        inputs: dict
+            the input parameters of the job
+
+        Returns
+        -------
+        UUID
+        """
+        ...
+
+    @abstractmethod
+    def get(self, job_id: str) -> Job:
+         ...
+
+    @abstractmethod
+    def update(self, job_id: str, job: Job) -> None:
+        ...
+
+class SqlJobDAO(ABC):
+    
+    def __init__(self, db_url: str):
+        """Initialize DB."""
+        self._engine = create_engine(db_url)
+        metadata.create_all(self._engine)
+
+    @abstractmethod
+    def create(
+        self,
+        job_status: JobStatusType,
+        exec_profile: ExecProfile,
+        workflow: dict,
+        inputs: dict,
+    ) -> UUID:
+        """
+        Inserts a job into the database.
+
+        Parameters
+        ----------
+        job_status: JobStatusType
+            current status of the job; initially it is JobStatusType.NOTSTARTED
+        exec_profile: ExecProfile
+            exec profile of this job
+        workflow
+            the jobs workflow
+        inputs: dict
+            the input parameters of the job
+
+        Returns
+        -------
+        UUID
+        """
+        with self._engine.connect() as connection:
+            connection.execute(
+                insert(DBJob.__table__).values(
+                    job_status=job_status.value,
+                    exec_profile=exec_profile.dict(),
+                    workflow=workflow,
+                    inputs=inputs,
+                )
+            )
+        return job_id
+
+
+    @abstractmethod
+    def get(job_id) -> Job:
+         # another sql query here
 
 def create_job_dao(
     job_status: JobStatusType,
@@ -59,23 +143,6 @@ def create_job_dao(
     -------
     UUID
     """
-    job_id = generate_job_id()
-    job_id_str = str(job_id)
-    job_status_str = job_status.value
-    exec_profile_json = json.dumps(
-        {
-            "exec_profile_type": exec_profile.exec_profile_type.value,
-            "wf_lang": exec_profile.wf_lang.value,
-        }
-    )
-    inputs_json = json.dumps(inputs)
-    with db_engine.connect() as connection:
-        connection.execute(
-            insert(DBJob.__table__).values(
-                (job_id_str, job_status_str, exec_profile_json, workflow, inputs_json)
-            )
-        )
-    return job_id
 
 
 def get_job(job_id: UUID, db_engine: Engine = DB_ENGINE) -> Job:
@@ -134,20 +201,3 @@ def update_job_status(
             .where(DBJob.job_id == str(job_id))
             .values(job_status=new_job_status.value)
         )
-
-
-def generate_job_id() -> UUID:
-    """
-    Generates a unique job id.
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-    UUID
-    """
-    job_id = uuid4()
-    # while get_job(job_id) is not None:
-    # job_id = uuid4()
-    return job_id

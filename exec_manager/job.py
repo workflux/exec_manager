@@ -1,5 +1,4 @@
-# Copyright 2021 - 2022 Universität Tübingen, DKFZ and EMBL
-# for the German Human Genome-Phenome Archive (GHGA)
+# Copyright 2021 - 2022 German Cancer Research Center (DKFZ)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +14,14 @@
 
 """class for job"""
 
+from abc import ABC, abstractmethod
 from uuid import UUID
 
 from exec_manager.exec_profile import ExecProfile
 from exec_manager.job_status_type import JobStatusType
 
 
-class Job:
+class Job(ABC):
     """
     class for job
 
@@ -69,9 +69,7 @@ class Job:
         self.job_status = job_status
         self.exec_profile = exec_profile
 
-    # def __hash__(self) -> int:
-    #     return hash((self.job_id, self.job_status, self.exec_profile))
-
+    @abstractmethod
     def prepare(self) -> None:
         """
         Prepares the job.
@@ -83,7 +81,9 @@ class Job:
         -------
         NONE
         """
+        ...
 
+    @abstractmethod
     def exec(self) -> None:
         """
         Executes the job.
@@ -95,7 +95,9 @@ class Job:
         -------
         NONE
         """
+        ...
 
+    @abstractmethod
     def eval(self) -> None:
         """
         Evaluates the job.
@@ -107,7 +109,9 @@ class Job:
         -------
         NONE
         """
+        ...
 
+    @abstractmethod
     def finalize(self) -> None:
         """
         Finalizes the job.
@@ -119,7 +123,9 @@ class Job:
         -------
         NONE
         """
+        ...
 
+    @abstractmethod
     def cancel(self) -> None:
         """
         Cancels the job.
@@ -131,3 +137,4 @@ class Job:
         -------
         NONE
         """
+        ...
