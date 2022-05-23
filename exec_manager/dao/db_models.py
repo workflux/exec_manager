@@ -23,13 +23,22 @@ from sqlalchemy.orm.decl_api import DeclarativeMeta
 Base: DeclarativeMeta = declarative_base()
 metadata = Base.metadata
 
+# this method is neccessary to avoid IntegrityError
+def generate_uuid_str() -> str:
+    """Generates a uuid with type string.
+
+    Returns:
+        str: job id
+    """
+    return str(uuid.uuid4())
+
 
 class DBJob(Base):
     """An job object stored in the DB"""
 
     __tablename__ = "job"
 
-    job_id = Column(String, default=uuid.uuid4(), primary_key=True)
+    job_id = Column(String, default=generate_uuid_str, primary_key=True)
     job_status = Column(String, nullable=False)
     exec_profile = Column(JSON, nullable=False)
     workflow = Column(JSON, nullable=False)

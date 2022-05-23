@@ -26,15 +26,10 @@ from exec_manager.utils import WfLangType
 
 @pytest.fixture
 def example_sqlite_job_dao() -> Generator:
-    """
-    Creates sqlite engine.
+    """Creates sqlite engine.
 
-    Parameters
-    ----------
-
-    Returns
-    -------
-    None
+    Yields:
+        Generator: sqlite engine
     """
     engine = SQLJobDAO("sqlite+pysqlite://")
     yield engine
@@ -42,60 +37,40 @@ def example_sqlite_job_dao() -> Generator:
 
 @pytest.fixture
 def example_job_status() -> JobStatusType:
-    """
-    Creates a job status.
+    """Creates a job status.
 
-    Parameters
-    ----------
-
-    Returns
-    -------
-    JobStatusType
+    Returns:
+        JobStatusType: job status for tests
     """
     return JobStatusType.NOTSTARTET
 
 
 @pytest.fixture
 def example_exec_profile() -> ExecProfile:
-    """
-    Creates an exec profile.
+    """Creates an exec profile.
 
-    Parameters
-    ----------
-
-    Returns
-    -------
-    ExecProfile
+    Returns:
+        ExecProfile: exec profile for tests
     """
     return ExecProfile(type_=ExecProfileType.PYTHON, wf_lang=WfLangType.CWL)
 
 
 @pytest.fixture
 def example_workflow() -> dict:
-    """
-    Creates a workflow.
+    """Creates a workflow.
 
-    Parameters
-    ----------
-
-    Returns
-    -------
-    dict
+    Returns:
+        dict: workflow
     """
     return {"test": 1}
 
 
 @pytest.fixture
 def example_inputs() -> dict:
-    """
-    Creates inputs.
+    """Creates inputs.
 
-    Parameters
-    ----------
-
-    Returns
-    -------
-    dict
+    Returns:
+        dict: input parameters for the workflow
     """
     return {"hello": "world"}
 
@@ -108,25 +83,17 @@ def example_job_id(
     example_inputs: dict,
     example_sqlite_job_dao,
 ) -> UUID:
-    """
-    Creates a job id.
+    """Creates a job id.
 
-    Parameters
-    ----------
-    example_job_status: JobStatusType
-        status of the job
-    example_exec_profile: ExecProfile
-        execution profile of the job
-    example_workflow: dict
-        job's workflow
-    example_inputs: dict
-        input parameters of the workflow
-    example_sqlite_job_dao
-        database engine
+    Args:
+        example_job_status (JobStatusType): status of the job
+        example_exec_profile (ExecProfile): execution profile of the job
+        example_workflow (dict): job's workflow
+        example_inputs (dict): input parameters of the workflow
+        example_sqlite_job_dao (_type_): database engine
 
-    Returns
-    -------
-    UUID
+    Returns:
+        UUID: job id
     """
     return example_sqlite_job_dao.create(
         example_job_status,
@@ -150,25 +117,14 @@ def test_create(
     example_inputs: dict,
     example_sqlite_job_dao,
 ) -> None:
-    """
-    Tests the create method from SQLJobDAO class.
+    """Tests the create method from SQLJobDAO class.
 
-    Parameters
-    ----------
-    example_job_status: JobStatusType
-        status of the job
-    example_exec_profile: ExecProfile
-        execution profile of the job
-    example_workflow: dict
-        job's workflow
-    example_inputs: dict
-        input parameters of the workflow
-    example_sqlite_job_dao
-        database engine
-
-    Returns
-    -------
-    None
+    Args:
+        example_job_status (JobStatusType): status of the job
+        example_exec_profile (ExecProfile): execution profile of the job
+        example_workflow (dict): job's workflow
+        example_inputs (dict): input parameters of the workflow
+        example_sqlite_job_dao (_type_): database engine
     """
     job_id = example_sqlite_job_dao.create(
         example_job_status,
@@ -198,7 +154,7 @@ def test_create(
 
 
 @pytest.mark.usefixtures(
-    "example_sqlite_job_dao", "example_job_id", "example_exec_profile"
+    "example_sqlite_job_dgao", "example_job_id", "example_exec_profile"
 )
 def test_get(
     example_job_id: UUID,
@@ -206,23 +162,13 @@ def test_get(
     example_exec_profile: ExecProfile,
     example_sqlite_job_dao,
 ) -> None:
-    """
-    Tests the get method from SQLJobDAO class.
+    """Tests the get method from SQLJobDAO class.
 
-    Parameters
-    ----------
-    example_job_id: UUID
-        id of the job
-    example_job_status: JobStatusType
-        status of the job
-    example_exec_profile: ExecProfile
-        execution profile of the job
-    example_sqlite_job_dao
-        database engine
-
-    Returns
-    -------
-    None
+    Args:
+        example_job_id (UUID): id of the job
+        example_job_status (JobStatusType): status of the job
+        example_exec_profile (ExecProfile): execution profile of the job
+        example_sqlite_job_dao (_type_): database engine
     """
     job_id = example_job_id
     db_job = example_sqlite_job_dao.get(job_id)
@@ -255,23 +201,13 @@ def test_update(
     example_inputs: dict,
     example_sqlite_job_dao,
 ) -> None:
-    """
-    Tests the update method from SQLJobDAO class.
+    """Tests the update method from SQLJobDAO class.
 
-    Parameters
-    ----------
-    example_job_id: UUID
-        id of the job
-    example_exec_profile: ExecProfile
-        execution profile of the job
-    example_inputs: dict
-        input parameters of the workflow
-    example_sqlite_job_dao: Engine
-        database engine
-
-    Returns
-    -------
-    None
+    Args:
+        example_job_id (UUID): id of the job
+        example_exec_profile (ExecProfile): execution profile of the job
+        example_inputs (dict): input parameters of the workflow
+        example_sqlite_job_dao (_type_): database engine
     """
     job_id = example_job_id
     job = PythonJob(

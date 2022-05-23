@@ -24,32 +24,21 @@ from exec_manager.jobs import Job, JobStatusType, PythonJob
 
 
 class PyExecSession:
-    """
-    class for python job
+    """Class for PyExecSession
 
-    ...
-
-    Attributes
-    ----------
-    max_retries : int
-
-    Methods
-    -------
-    run() -> None
-        runs a job
+    Methods:
+        run (): runs a job
     """
 
     def __init__(
         self,
         max_retries: int = 0,
     ) -> None:
-        """
-        Constructs all the necessary attributes for the python exec session.
+        """Constructs all the necessary attributes for the python exec session.
 
-        Parameters
-        ----------
-        max_retries : int
-            number of maximum retries when the execution fails (default: 0)
+        Args:
+            max_retries (int, optional): number of maximum retries when the execution
+                fails. Defaults to 0.
         """
         self._max_retries = max_retries
 
@@ -60,22 +49,15 @@ class PyExecSession:
         exec_profile: ExecProfile,
         inputs: dict,
     ) -> None:
-        """
-        runs a job.
+        """Runs a job.
 
-        Parameters
-        ----------
-        job_id: UUID
-            id of the job
-        job_status: JobStatusType
-            current status of the job (e.g. notstarted, executing, failed, ...)
-        exec_profile: ExecProfile
-            exec profile with which the job should be executed (bash, python, WES)
-        inputs: dict,
-
-        Returns
-        -------
-        NONE
+        Args:
+            job_id (UUID): id of the job
+            job_status (JobStatusType): current status of the job
+                (e.g. notstarted, executing, failed, ...)
+            exec_profile (ExecProfile): exec profile with which the job should be
+                executed (bash, python, WES)
+            inputs (dict): input parameters of the workflow
         """
         counter = -1
         sql_job_dao = SQLJobDAO("sqlite+pysqlite://")
@@ -104,21 +86,22 @@ def create_job(
     exec_profile: ExecProfile,
     create: Callable = SQLJobDAO.create,
 ) -> Job:
-    """
-    Creates a job.
+    """Creates a job.
 
-    Parameters
-    ----------
-    inputs: dict
-        input paramters of the job
-    workflow: dict
-        the job's workflow
-    exec_profile: ExecProfile
-        exec profile with which the job should be executed (bash, python, WES)
+    Args:
+        inputs (dict): input paramters of the job
+        workflow (dict): the job's workflow
+        exec_profile (ExecProfile): exec profile with which the job should be executed
+            (bash, python, WES)
+        create (Callable, optional): function that stores the job in a database.
+            Defaults to SQLJobDAO.create.
 
-    Returns
-    -------
-    Job
+    Raises:
+        NotImplementedError: Bash execution profile not implemented yet
+        NotImplementedError: WES execution profile not implemented yet
+
+    Returns:
+        Job: created job
     """
     job_status = JobStatusType.NOTSTARTET
     job_id = create(job_status, exec_profile, workflow, inputs)

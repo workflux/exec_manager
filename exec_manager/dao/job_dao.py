@@ -14,7 +14,6 @@
 
 """module for job dao"""
 
-import json
 from abc import ABC, abstractmethod
 from uuid import UUID
 
@@ -27,7 +26,13 @@ from exec_manager.utils import WfLangType
 
 
 class JobDAO(ABC):
-    """abstract class for job dao"""
+    """abstract class for job dao
+
+    Methods:
+        create (UUID): inserts a job into database
+        get (Job): returns a job by its id
+        update (): updates a job by its id
+    """
 
     @abstractmethod
     def create(
@@ -37,63 +42,51 @@ class JobDAO(ABC):
         workflow: dict,
         inputs: dict,
     ) -> UUID:
-        """
-        Inserts a job into the database.
+        """Inserts a job into the database.
 
-        Parameters
-        ----------
-        job_status: JobStatusType
-            current status of the job; initially it is JobStatusType.NOTSTARTED
-        exec_profile: ExecProfile
-            exec profile of this job
-        workflow
-            the jobs workflow
-        inputs: dict
-            the input parameters of the job
+        Args:
+            job_status (JobStatusType): current status of the job;
+                initially it is JobStatusType.NOTSTARTED
+            exec_profile (ExecProfile): exec profile of this job
+            workflow (dict): the jobs workflow
+            inputs (dict): the input parameters of the job
 
-        Returns
-        -------
-        UUID
+        Returns:
+            UUID: job id
         """
         ...
 
     @abstractmethod
     def get(self, job_id: UUID) -> Job:
-        """
-        Returns a job by his job id.
+        """Returns a job by its job id.
 
-        Parameters
-        ----------
-        job_id: UUID
-            id of the job
+        Args:
+            job_id (UUID): id of the job
 
-        Returns
-        -------
-        Job
+        Returns:
+            Job: job belongig to job id
         """
         ...
 
     @abstractmethod
     def update(self, job_id: UUID, job: Job) -> None:
-        """
-        Updates a jobs by his id.
+        """Updates a jobs by its id.
 
-        Parameters
-        ----------
-        job_id: UUID
-            id of the job
-        job: Job
-            updated job
-
-        Returns
-        -------
-        None
+        Args:
+            job_id (UUID): id of the job
+            job (Job): updated job
         """
         ...
 
 
 class SQLJobDAO(JobDAO):
-    """class for sql job dao"""
+    """class for sql job dao
+
+    Methods:
+        create (UUID): inserts a job into database
+        get (Job): returns a job by its id
+        update (): updates a job by its id
+    """
 
     def __init__(self, db_url: str):
         """Initialize DB."""
@@ -107,50 +100,45 @@ class SQLJobDAO(JobDAO):
         workflow: dict,
         inputs: dict,
     ) -> UUID:
-        """
-        Inserts a job into the database.
+        """Inserts a job into the database.
 
-        Parameters
-        ----------
-        job_status: JobStatusType
-            current status of the job; initially it is JobStatusType.NOTSTARTED
-        exec_profile: ExecProfile
-            exec profile of this job
-        workflow: dict
-            the jobs workflow
-        inputs: dict
-            the input parameters of the job
+        Args:
+            job_status (JobStatusType): current status of the job;
+                initially it is JobStatusType.NOTSTARTED
+            exec_profile (ExecProfile): exec profile of this job
+            workflow (dict): the jobs workflow
+            inputs (dict): the input parameters of the job
 
-        Returns
-        -------
-        UUID
+        Returns:
+            UUID: job id
         """
         with self._engine.connect() as connection:
             cursor = connection.execute(
-                insert(DBJob.__table__)
-                .values(
+                insert(DBJob.__table__).values(
                     job_status=job_status.value,
-                    exec_profile=exec_profile.dict(),
+                    exec_profile={
+                        "exec_profile_type": exec_profile.type_.value,
+                        "wf_lang_type": exec_profile.wf_lang.value,
+                    },
                     workflow=workflow,
                     inputs=inputs,
                 )
-                .returning(DBJob.job_id)
             )
-            result = cursor.fetchall
-        return result[0][0]  # job_id
+            job_id = cursor.inserted_primary_key[0]
+        return job_id
 
     def get(self, job_id: UUID) -> Job:
-        """
-        Returns a job by his job id.
+        """Returns a job by its job id.
 
-        Parameters
-        ----------
-        job_id: UUID
-            id of the job
+        Args:
+            job_id (UUID): id of the job
 
-        Returns
-        -------
-        Job
+        Raises:
+            NotImplementedError: Bash exec profile is not implemented yet
+            NotImplementedError: WES exec profile is not implemented yet
+
+        Returns:
+            Job: job belonging to job_id
         """
         with self._engine.connect() as connection:
             cursor = connection.execute(
@@ -160,13 +148,13 @@ class SQLJobDAO(JobDAO):
             )
             result = cursor.fetchall()
             job_status = JobStatusType(result[0][1])
-            exec_profile = json.loads(result[0][2])
+            exec_profile = result[0][2]
             exec_profile = ExecProfile(
                 type_=ExecProfileType(exec_profile["exec_profile_type"]),
-                wf_lang=WfLangType(exec_profile["wf_lang"]),
+                wf_lang=WfLangType(exec_profile["wf_lang_type"]),
             )
-            inputs = json.loads(result[0][4])
             if exec_profile.type_ == ExecProfileType.PYTHON:
+                inputs = result[0][4]
                 return PythonJob(job_id, job_status, exec_profile, inputs)
             if exec_profile.type_ == ExecProfileType.BASH:
                 raise NotImplementedError(
@@ -177,19 +165,11 @@ class SQLJobDAO(JobDAO):
             )
 
     def update(self, job_id: UUID, job: Job) -> None:
-        """
-        Updates a jobs by his id.
+        """Updates a jobs by its id.
 
-        Parameters
-        ----------
-        job_id: UUID
-            id of the job
-        job: Job
-            updated job
-
-        Returns
-        -------
-        None
+        Args:
+            job_id (UUID): id of the job
+            job (Job): updated job
         """
         with self._engine.connect() as connection:
             connection.execute(
@@ -197,6 +177,9 @@ class SQLJobDAO(JobDAO):
                 .where(DBJob.job_id == str(job_id))
                 .values(
                     job_status=job.job_status.value,
-                    exec_profile=job.exec_profile.dict(),
+                    exec_profile={
+                        "exec_profile_type": job.exec_profile.type_.value,
+                        "wf_lang_type": job.exec_profile.wf_lang.value,
+                    },
                 )
             )

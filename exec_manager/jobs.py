@@ -44,48 +44,33 @@ class JobStatusType(Enum):
 
 
 class Job(ABC):
-    """
-    class for job
+    """abstract class for job
 
-    ...
+    Args:
+        job_id (UUID): id of the job
+        job_status (JobStatusType): current status of the job (eg. notstarted, succeeded, failed)
+        exec_profile (ExecProfile): exec profile with which the job should be executed
 
-    Attributes
-    ----------
-    job_id : uuid
-        id of the job
-    job_status : JobStatusType
-        current status of the job (eg. notstarted, succeeded, failed)
-    exec_profile : ExecProfile
-        exec profile with which the job should be executed
+    Methods:
+        prepare (): prepares the job
+        exec (): executes the job
+        eval (): evaluates the job
+        finalize (): finalizes the job
+        cancel (): cancels the job
 
-    Methods
-    -------
-    prepare() -> None:
-        prepares the job
-    exec() -> None:
-        executes the job
-    eval() -> None:
-        evaluates the job
-    finalize() -> None:
-        finalizes the job
-    cancel() -> None:
-        cancels the job
     """
 
     def __init__(
         self, job_id: UUID, job_status: JobStatusType, exec_profile: ExecProfile
     ) -> None:
-        """
-        Constructs all the necessary attributes for the job object.
+        """Constructs all the necessary attributes for the job object.
 
-        Parameters
-        ----------
-        job_id : UUID
-            id of the job
-        job_status : JobStatusType
-            current status of the job (eg. notstarted, succeeded, failed, ...)
-        exec_profile : ExecProfile
-            exec profile with which the job should be executed (bash, python, WES)
+        Args:
+            job_id (UUID): id of the job
+            job_status (JobStatusType): current status of the job
+                (eg. notstarted, succeeded, failed, ...)
+            exec_profile (ExecProfile): exec profile with which the job should be
+                executed (bash, python, WES)
         """
         self.job_id = job_id
         self.job_status = job_status
@@ -93,72 +78,27 @@ class Job(ABC):
 
     @abstractmethod
     def prepare(self) -> None:
-        """
-        Prepares the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Prepares the job."""
         ...
 
     @abstractmethod
     def exec(self) -> None:
-        """
-        Executes the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Executes the job."""
         ...
 
     @abstractmethod
     def eval(self) -> None:
-        """
-        Evaluates the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Evaluates the job."""
         ...
 
     @abstractmethod
     def finalize(self) -> None:
-        """
-        Finalizes the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Finalizes the job."""
         ...
 
     @abstractmethod
     def cancel(self) -> None:
-        """
-        Cancels the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Cancels the job."""
         ...
 
 
@@ -166,31 +106,18 @@ class PythonJob(Job):
     """
     class for python job
 
-    ...
+    Args:
+        job_id (UUID): id of the job
+        job_status (JobStatusType): current status of the job (eg. notstarted, succeeded, failed)
+        exec_profile (ExecProfile): python exec profile
+        inputs (dict): input parameters of the job
 
-    Attributes
-    ----------
-    job_id : UUID
-        id of the job
-    job_status : JobStatusType
-        current status of the job (eg. notstarted, succeeded, failed)
-    exec_profile : ExecProfile
-        python exec profile
-    inputs : dict
-        input parameters of the job
-
-    Methods
-    -------
-    prepare() -> None:
-        prepares the job
-    exec() -> None:
-        executes the job
-    eval() -> None:
-        evaluates the job
-    finalize() -> None:
-        finalizes the job
-    cancel() -> None:
-        cancels the job
+    Methods:
+        prepare (): prepares the job
+        exec (): executes the job
+        eval (): evaluates the job
+        finalize (): finalizes the job
+        cancel (): cancels the job
     """
 
     def __init__(
@@ -200,80 +127,35 @@ class PythonJob(Job):
         exec_profile: ExecProfile,
         inputs: dict,
     ) -> None:
-        """
-        Constructs all the necessary attributes for the python job object.
+        """Constructs all the necessary attributes for the python job object.
 
-        Parameters
-        ----------
-        job_id : uuid
-            id of the job
-        job_status : JobStatusType
-            current status of the job (eg. notstarted, succeeded, failed)
-        exec_profile : ExecProfile
-            python exec profile
-        inputs : dict
-            input parameters of the job
+        Args:
+            job_id (UUID): id of the job
+            job_status (JobStatusType): current status of the job
+                (eg. notstarted, succeeded, failed)
+            exec_profile (ExecProfile): python exec profile
+            inputs (dict): input parameters of the job
         """
         Job.__init__(self, job_id, job_status, exec_profile)
         self.inputs = inputs
         self.wf_lang = exec_profile.wf_lang
 
     def prepare(self) -> None:
-        """
-        Prepares the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Prepares the job."""
+        ...
 
     def exec(self) -> None:
-        """
-        Executes the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Executes the job."""
+        ...
 
     def eval(self) -> None:
-        """
-        Evaluates the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Evaluates the job."""
+        ...
 
     def finalize(self) -> None:
-        """
-        Finalizes the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Finalizes the job."""
+        ...
 
     def cancel(self) -> None:
-        """
-        Cancels the job.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-        NONE
-        """
+        """Cancels the job."""
+        ...

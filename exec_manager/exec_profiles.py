@@ -34,20 +34,11 @@ class ExecProfileType(Enum):
 
 
 class ExecProfile(BaseModel):
-    """
-    class for Exec-Profile
+    """Base model class for execution profiles.
 
-    ...
-
-    Attributes
-    ----------
-    exec_profile_type : ExecProfileType
-        type of the exec profile (bash, python, wes)
-    wf_lang : WfLangType
-        workflow language (cwl, wdl, nextflow, snakemake)
-
-    Methods
-    -------
+    Args:
+        type_ (ExecProfileType): type of the execution profile (Python, Bash or WES)
+        wf_lang (WfLangType): language type of workflow (CWL, WDL, Snakemake, Nextflow)
     """
 
     type_: ExecProfileType
