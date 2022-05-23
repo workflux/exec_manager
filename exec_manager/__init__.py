@@ -1,5 +1,4 @@
-# Copyright 2021 - 2022 Universität Tübingen, DKFZ and EMBL
-# for the German Human Genome-Phenome Archive (GHGA)
+# Copyright 2021 - 2022 German Cancer Research Center (DKFZ)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Short description of package"""  # Please adapt to package
-
+"""
+A package managing execution of jobs in a way that is agnostic to
+- the workflow execution environment
+- the language used to describe the workflow
+"""
 __version__ = "0.1.0"

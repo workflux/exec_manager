@@ -12,8 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utils for Fixture handling"""
+"""module for utility stuff"""
 
-from pathlib import Path
+from enum import Enum
 
-BASE_DIR = Path(__file__).parent.resolve()
+
+class WfLangType(Enum):
+    """Enumerate workflow language types:
+    - CWL: cwl language
+    - WDL: wdl language
+    - NEXTFLOW: nextflow  language
+    - SNAKEMAKE: snakemake language
+    """
+
+    CWL = "cwl"
+    WDL = "wdl"
+    NEXTFLOW = "nextflow"
+    SNAKEMAKE = "snakemake"
