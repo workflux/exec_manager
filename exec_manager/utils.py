@@ -29,7 +29,3 @@ class WfLangType(Enum):
     WDL = "wdl"
     NEXTFLOW = "nextflow"
     SNAKEMAKE = "snakemake"
-
-
-class hello:
-    print("test")
