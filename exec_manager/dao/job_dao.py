@@ -162,13 +162,13 @@ class SQLJobDAO(JobDAO):
             job_status = JobStatusType(result[0][1])
             exec_profile = json.loads(result[0][2])
             exec_profile = ExecProfile(
-                ExecProfileType(exec_profile["exec_profile_type"]),
-                WfLangType(exec_profile["wf_lang"]),
+                type_=ExecProfileType(exec_profile["exec_profile_type"]),
+                wf_lang=WfLangType(exec_profile["wf_lang"]),
             )
             inputs = json.loads(result[0][4])
             if exec_profile.type_ == ExecProfileType.PYTHON:
                 return PythonJob(job_id, job_status, exec_profile, inputs)
-            if exec_profile.exec_profile_type == ExecProfileType.BASH:
+            if exec_profile.type_ == ExecProfileType.BASH:
                 raise NotImplementedError(
                     "Execution profiles of type Bash not supported, yet"
                 )

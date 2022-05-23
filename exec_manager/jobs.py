@@ -16,11 +16,9 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable
 from uuid import UUID
 
-from exec_manager.dao.job_dao import SQLJobDAO
-from exec_manager.exec_profiles import ExecProfile, ExecProfileType
+from exec_manager.exec_profiles import ExecProfile
 
 
 class JobStatusType(Enum):
@@ -279,109 +277,3 @@ class PythonJob(Job):
         -------
         NONE
         """
-
-
-class PyExecSession:
-    """
-    class for python job
-
-    ...
-
-    Attributes
-    ----------
-    max_retries : int
-
-    Methods
-    -------
-    run() -> None
-        runs a job
-    """
-
-    def __init__(
-        self,
-        max_retries: int = 0,
-    ) -> None:
-        """
-        Constructs all the necessary attributes for the python exec session.
-
-        Parameters
-        ----------
-        max_retries : int
-            number of maximum retries when the execution fails (default: 0)
-        """
-        self._max_retries = max_retries
-
-    def run(
-        self,
-        job_id: UUID,
-        job_status: JobStatusType,
-        exec_profile: ExecProfile,
-        inputs: dict,
-    ) -> None:
-        """
-        runs a job.
-
-        Parameters
-        ----------
-        job_id: UUID
-            id of the job
-        job_status: JobStatusType
-            current status of the job (e.g. notstarted, executing, failed, ...)
-        exec_profile: ExecProfile
-            exec profile with which the job should be executed (bash, python, WES)
-        inputs: dict,
-
-        Returns
-        -------
-        NONE
-        """
-        counter = -1
-        sql_job_dao = SQLJobDAO("sqlite+pysqlite://")
-        while self._max_retries > counter:
-            python_job = PythonJob(job_id, job_status, exec_profile, inputs)
-            python_job.job_status = JobStatusType.PREPARING
-            sql_job_dao.update(job_id, python_job)
-            python_job.prepare()
-            python_job.job_status = JobStatusType.EXECUTING
-            sql_job_dao.update(job_id, python_job)
-            python_job.exec()
-            python_job.job_status = JobStatusType.EVALUATING
-            sql_job_dao.update(job_id, python_job)
-            python_job.eval()
-            python_job.job_status = JobStatusType.FINALZING
-            sql_job_dao.update(job_id, python_job)
-            python_job.finalize()
-            if sql_job_dao.get(job_id).job_status == JobStatusType.SUCCEEDED:
-                break
-            counter = counter + 1
-
-
-def create_job(
-    inputs: dict,
-    workflow: dict,
-    exec_profile: ExecProfile,
-    create: Callable = SQLJobDAO.create,
-) -> Job:
-    """
-    Creates a job.
-
-    Parameters
-    ----------
-    inputs: dict
-        input paramters of the job
-    workflow: dict
-        the job's workflow
-    exec_profile: ExecProfile
-        exec profile with which the job should be executed (bash, python, WES)
-
-    Returns
-    -------
-    Job
-    """
-    job_status = JobStatusType.NOTSTARTET
-    job_id = create(job_status, exec_profile, workflow, inputs)
-    if exec_profile.exec_profile_type == ExecProfileType.PYTHON:
-        return PythonJob(job_id, job_status, exec_profile, inputs)
-    if exec_profile.exec_profile_type == ExecProfileType.BASH:
-        raise NotImplementedError("Execution profiles of type Bash not supported, yet")
-    raise NotImplementedError("Execution profiles of type WES not supported, yet")
