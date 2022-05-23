@@ -12,25 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""class for job dao"""
+"""module for job dao"""
 
 import json
-from uuid import UUID, uuid4
+from abc import ABC, abstractmethod
+from uuid import UUID
 
 from sqlalchemy import create_engine, insert, select, update
-from sqlalchemy.engine import Engine
 
 from exec_manager.dao.db_models import DBJob, metadata
-from exec_manager.exec_profile import ExecProfile
-from exec_manager.exec_profile_type import ExecProfileType
-from exec_manager.job import Job
-from exec_manager.job_status_type import JobStatusType
-from exec_manager.wf_lang_type import WfLangType
+from exec_manager.exec_profiles import ExecProfile, ExecProfileType
+from exec_manager.jobs import Job, JobStatusType, PythonJob
+from exec_manager.utils import WfLangType
 
-from abc import ABC, abstractmethod
 
 class JobDAO(ABC):
-    
+    """abstract class for job dao"""
+
     @abstractmethod
     def create(
         self,
@@ -60,21 +58,48 @@ class JobDAO(ABC):
         ...
 
     @abstractmethod
-    def get(self, job_id: str) -> Job:
-         ...
+    def get(self, job_id: UUID) -> Job:
+        """
+        Returns a job by his job id.
 
-    @abstractmethod
-    def update(self, job_id: str, job: Job) -> None:
+        Parameters
+        ----------
+        job_id: UUID
+            id of the job
+
+        Returns
+        -------
+        Job
+        """
         ...
 
-class SqlJobDAO(ABC):
-    
+    @abstractmethod
+    def update(self, job_id: UUID, job: Job) -> None:
+        """
+        Updates a jobs by his id.
+
+        Parameters
+        ----------
+        job_id: UUID
+            id of the job
+        job: Job
+            updated job
+
+        Returns
+        -------
+        None
+        """
+        ...
+
+
+class SQLJobDAO(JobDAO):
+    """class for sql job dao"""
+
     def __init__(self, db_url: str):
         """Initialize DB."""
         self._engine = create_engine(db_url)
         metadata.create_all(self._engine)
 
-    @abstractmethod
     def create(
         self,
         job_status: JobStatusType,
@@ -91,7 +116,7 @@ class SqlJobDAO(ABC):
             current status of the job; initially it is JobStatusType.NOTSTARTED
         exec_profile: ExecProfile
             exec profile of this job
-        workflow
+        workflow: dict
             the jobs workflow
         inputs: dict
             the input parameters of the job
@@ -101,103 +126,77 @@ class SqlJobDAO(ABC):
         UUID
         """
         with self._engine.connect() as connection:
-            connection.execute(
-                insert(DBJob.__table__).values(
+            cursor = connection.execute(
+                insert(DBJob.__table__)
+                .values(
                     job_status=job_status.value,
                     exec_profile=exec_profile.dict(),
                     workflow=workflow,
                     inputs=inputs,
                 )
+                .returning(DBJob.job_id)
             )
-        return job_id
+            result = cursor.fetchall
+        return result[0][0]  # job_id
 
+    def get(self, job_id: UUID) -> Job:
+        """
+        Returns a job by his job id.
 
-    @abstractmethod
-    def get(job_id) -> Job:
-         # another sql query here
+        Parameters
+        ----------
+        job_id: UUID
+            id of the job
 
-def create_job_dao(
-    job_status: JobStatusType,
-    exec_profile: ExecProfile,
-    workflow: dict,
-    inputs: dict,
-    db_engine: Engine = DB_ENGINE,
-) -> UUID:
-    """
-    Inserts a job into the database.
-
-    Parameters
-    ----------
-    job_status: JobStatusType
-        current status of the job; initially it is JobStatusType.NOTSTARTED
-    exec_profile: ExecProfile
-        exec profile of this job
-    workflow
-        the jobs workflow
-    inputs: dict
-        the input parameters of the job
-    engine: engine
-        db engine where the connection will be established (default is sqlite with pysqlite)
-
-    Returns
-    -------
-    UUID
-    """
-
-
-def get_job(job_id: UUID, db_engine: Engine = DB_ENGINE) -> Job:
-    """
-    Returns a job by his job id.
-
-    Parameters
-    ----------
-    job_id: UUID
-        id of the job
-    engine: engine
-        db engine where the connection will be established (default is sqlite with pysqlite)
-
-    Returns
-    -------
-    Job
-    """
-    with db_engine.connect() as connection:
-        cursor = connection.execute(
-            select([DBJob.job_id, DBJob.job_status, DBJob.exec_profile]).where(
-                DBJob.job_id == str(job_id)
+        Returns
+        -------
+        Job
+        """
+        with self._engine.connect() as connection:
+            cursor = connection.execute(
+                select([DBJob.job_id, DBJob.job_status, DBJob.exec_profile]).where(
+                    DBJob.job_id == str(job_id)
+                )
             )
-        )
-        result = cursor.fetchall()
-        job_status = JobStatusType(result[0][1])
-        exec_profile = json.loads(result[0][2])
-        exec_profile = ExecProfile(
-            ExecProfileType(exec_profile["exec_profile_type"]),
-            WfLangType(exec_profile["wf_lang"]),
-        )
-        return Job(job_id, job_status, exec_profile)
+            result = cursor.fetchall()
+            job_status = JobStatusType(result[0][1])
+            exec_profile = json.loads(result[0][2])
+            exec_profile = ExecProfile(
+                ExecProfileType(exec_profile["exec_profile_type"]),
+                WfLangType(exec_profile["wf_lang"]),
+            )
+            inputs = json.loads(result[0][4])
+            if exec_profile.type_ == ExecProfileType.PYTHON:
+                return PythonJob(job_id, job_status, exec_profile, inputs)
+            if exec_profile.exec_profile_type == ExecProfileType.BASH:
+                raise NotImplementedError(
+                    "Execution profiles of type Bash not supported, yet"
+                )
+            raise NotImplementedError(
+                "Execution profiles of type WES not supported, yet"
+            )
 
+    def update(self, job_id: UUID, job: Job) -> None:
+        """
+        Updates a jobs by his id.
 
-def update_job_status(
-    job_id: UUID, new_job_status: JobStatusType, db_engine: Engine = DB_ENGINE
-) -> None:
-    """
-    Updates a jobs status by his job id.
+        Parameters
+        ----------
+        job_id: UUID
+            id of the job
+        job: Job
+            updated job
 
-    Parameters
-    ----------
-    job_id: UUID
-        id of the job
-    new_job_status: JobStatusType
-        new status of the job; cannot be JobStatusType.NOTSTARTED
-    engine: engine
-        db engine where the connection will be established (default is sqlite with pysqlite)
-
-    Returns
-    -------
-    None
-    """
-    with db_engine.connect() as connection:
-        connection.execute(
-            update(DBJob.__table__)
-            .where(DBJob.job_id == str(job_id))
-            .values(job_status=new_job_status.value)
-        )
+        Returns
+        -------
+        None
+        """
+        with self._engine.connect() as connection:
+            connection.execute(
+                update(DBJob.__table__)
+                .where(DBJob.job_id == str(job_id))
+                .values(
+                    job_status=job.job_status.value,
+                    exec_profile=job.exec_profile.dict(),
+                )
+            )

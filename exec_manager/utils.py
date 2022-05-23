@@ -12,22 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""enum for workflow languagae type"""
+"""module for utility stuff"""
 
 from enum import Enum
 
 
 class WfLangType(Enum):
-    """enumerate workflow language types"""
+    """Enumerate workflow language types:
+    - CWL: cwl language
+    - WDL: wdl language
+    - NEXTFLOW: nextflow  language
+    - SNAKEMAKE: snakemake language
+    """
 
     CWL = "cwl"
-    """cwl language"""
-
     WDL = "wdl"
-    """wdl language"""
-
     NEXTFLOW = "nextflow"
-    """nextflow  language"""
-
     SNAKEMAKE = "snakemake"
-    """snakemake language"""
+
+
+class hello:
+    print("test")

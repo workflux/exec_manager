@@ -12,12 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""class for exec profile"""
+"""module for execution profiles"""
+
+from enum import Enum
 
 from pydantic import BaseModel
 
-from exec_manager.exec_profile_type import ExecProfileType
-from exec_manager.wf_lang_type import WfLangType
+from exec_manager.utils import WfLangType
+
+
+class ExecProfileType(Enum):
+    """Enumerate exec profile types:
+    - BASH: execution with bash
+    - PYTHON: execution with python
+    - WES: execution with wes
+    """
+
+    BASH = "bash"
+    PYTHON = "python"
+    WES = "wes"
 
 
 class ExecProfile(BaseModel):

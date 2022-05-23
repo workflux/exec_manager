@@ -14,116 +14,148 @@
 
 import json
 
-from exec_manager.dao.job_dao import create_job_dao, get_job, update_job_status
-from exec_manager.exec_profile import ExecProfile
-from exec_manager.exec_profile_type import ExecProfileType
-from exec_manager.job_status_type import JobStatusType
-from exec_manager.wf_lang_type import WfLangType
+import pytest
 
-# import pytest
-# from exec_manager.dao.db_models import metadata
-# from sqlalchemy import create_engine
+from exec_manager.dao.job_dao import SQLJobDAO
+from exec_manager.exec_profiles import ExecProfile, ExecProfileType
+from exec_manager.jobs import JobStatusType, PythonJob
+from exec_manager.utils import WfLangType
 
 
-# @pytest.fixture
-# def example_engine():
-#     engine = create_engine("sqlite+pysqlite://")
-#     metadata.create_all(engine)
-#     return engine
+@pytest.fixture
+def example_sqlite_job_dao():
+    engine = SQLJobDAO("sqlite+pysqlite://")
+    yield engine
 
 
-# @pytest.fixture
-# def example_job_id():
-#     return create_job_dao(
-#         JobStatusType.NOTSTARTET,
-#         ExecProfile(ExecProfileType.PYTHON, WfLangType.CWL),
-#         json.dumps({"test": 1}),
-#         {"hello": "world"},
+@pytest.fixture
+def example_job_status():
+    return JobStatusType.NOTSTARTET
+
+
+@pytest.fixture
+def example_exec_profile():
+    return ExecProfile(ExecProfileType.PYTHON, WfLangType.CWL)
+
+
+@pytest.fixture
+def example_workflow():
+    return {"test": 1}
+
+
+@pytest.fixture
+def example_inputs():
+    return {"hello": "world"}
+
+
+@pytest.fixture
+def example_job_id(
+    example_job_status,
+    example_exec_profile,
+    example_workflow,
+    example_inputs,
+    example_sqlite_job_dao,
+):
+    return example_sqlite_job_dao.create(
+        example_job_status,
+        example_exec_profile,
+        example_workflow,
+        example_inputs,
+    )
+
+
+@pytest.mark.usefixtures(
+    "example_sqlite_job_dao",
+    "example_job_id",
+    "example_exec_profile",
+    "example_workflow",
+    "example_inputs",
+)
+def test_create(
+    example_job_status,
+    example_exec_profile,
+    example_workflow,
+    example_inputs,
+    example_sqlite_job_dao,
+):
+    job_id = example_sqlite_job_dao.create(
+        example_job_status,
+        example_exec_profile,
+        example_workflow,
+        example_inputs,
+    )
+    db_job = example_sqlite_job_dao.get(job_id)
+    assert (
+        str(db_job.job_id) == str(job_id)
+        and db_job.job_status.value == example_job_status.value
+        and (
+            json.dumps(
+                {
+                    "exec_profile_type": db_job.exec_profile.exec_profile_type.value,
+                    "wf_lang": db_job.exec_profile.wf_lang.value,
+                }
+            )
+            == json.dumps(
+                {
+                    "exec_profile_type": example_exec_profile.exec_profile_type.value,
+                    "wf_lang": example_exec_profile.wf_lang.value,
+                }
+            )
+        )
+    )
+
+
+# @pytest.mark.usefixtures(
+#     "example_sqlite_job_dao", "example_job_id", "example_exec_profile"
+# )
+# def test_get(
+#     example_job_id, example_job_status, example_exec_profile, example_sqlite_job_dao
+# ):
+#     job_id = example_job_id
+#     db_job = example_sqlite_job_dao.get(job_id)
+#     assert (
+#         str(db_job.job_id) == str(job_id)
+#         and db_job.job_status.value == example_job_status.value
+#         and (
+#             json.dumps(
+#                 {
+#                     "exec_profile_type": db_job.exec_profile.exec_profile_type.value,
+#                     "wf_lang": db_job.exec_profile.wf_lang.value,
+#                 }
+#             )
+#             == json.dumps(
+#                 {
+#                     "exec_profile_type": example_exec_profile.exec_profile_type.value,
+#                     "wf_lang": example_exec_profile.wf_lang.value,
+#                 }
+#             )
+#         )
 #     )
 
 
-# engine = create_engine("sqlite+pysqlite://")
-# metadata.create_all(engine)
-job_status = JobStatusType.NOTSTARTET
-exec_profile = ExecProfile(ExecProfileType.PYTHON, WfLangType.CWL)
-workflow = {"test": 1}
-inputs = {"hello": "world"}
-example_job_id = create_job_dao(
-    JobStatusType.NOTSTARTET,
-    ExecProfile(ExecProfileType.PYTHON, WfLangType.CWL),
-    workflow,
-    inputs,
-)
-
-
-# @pytest.mark.usefixtures("example_engine")
-def test_create_job_dao():
-    job_id = create_job_dao(job_status, exec_profile, workflow, inputs)
-    db_job = get_job(job_id)
-    assert (
-        str(db_job.job_id) == str(job_id)
-        and db_job.job_status.value == job_status.value
-        and (
-            json.dumps(
-                {
-                    "exec_profile_type": db_job.exec_profile.exec_profile_type.value,
-                    "wf_lang": db_job.exec_profile.wf_lang.value,
-                }
-            )
-            == json.dumps(
-                {
-                    "exec_profile_type": ExecProfileType.PYTHON.value,
-                    "wf_lang": WfLangType.CWL.value,
-                }
-            )
-        )
-    )
-
-
-# @pytest.mark.usefixtures("example_engine")
-def test_get_job():
-    job_id = example_job_id
-    db_job = get_job(job_id)
-    assert (
-        str(db_job.job_id) == str(job_id)
-        and db_job.job_status.value == job_status.value
-        and (
-            json.dumps(
-                {
-                    "exec_profile_type": db_job.exec_profile.exec_profile_type.value,
-                    "wf_lang": db_job.exec_profile.wf_lang.value,
-                }
-            )
-            == json.dumps(
-                {
-                    "exec_profile_type": ExecProfileType.PYTHON.value,
-                    "wf_lang": WfLangType.CWL.value,
-                }
-            )
-        )
-    )
-
-
-# @pytest.mark.usefixtures("example_engine")
-def test_update_job_status():
-    job_id = example_job_id
-    update_job_status(job_id, JobStatusType.PREPARING)
-    db_job = get_job(job_id)
-    assert (
-        str(db_job.job_id) == str(job_id)
-        and db_job.job_status.value == JobStatusType.PREPARING.value
-        and (
-            json.dumps(
-                {
-                    "exec_profile_type": db_job.exec_profile.exec_profile_type.value,
-                    "wf_lang": db_job.exec_profile.wf_lang.value,
-                }
-            )
-            == json.dumps(
-                {
-                    "exec_profile_type": ExecProfileType.PYTHON.value,
-                    "wf_lang": WfLangType.CWL.value,
-                }
-            )
-        )
-    )
+# @pytest.mark.usefixtures(
+#     "example_sqlite_job_dao", "example_job_id", "example_exec_profile"
+# )
+# def test_update(
+#     example_job_id, example_exec_profile, example_inputs, example_sqlite_job_dao
+# ):
+#     job_id = example_job_id
+#     job = PythonJob(
+#         job_id, JobStatusType.PREPARING, example_exec_profile, example_inputs
+#     )
+#     example_sqlite_job_dao.update(job_id, job)
+#     db_job = example_sqlite_job_dao.get(job_id)
+#     assert (
+#         str(db_job.job_id) == str(job_id)
+#         and db_job.job_status.value == JobStatusType.PREPARING.value
+#         and (
+#             {
+#                 "exec_profile_type": db_job.exec_profile.exec_profile_type.value,
+#                 "wf_lang": db_job.exec_profile.wf_lang.value,
+#             }
+#             == {
+#                 "exec_profile_type": example_exec_profile.exec_profile_type.value,
+#                 "wf_lang": example_exec_profile.wf_lang.value,
+#             }
+#         )
+#     )
